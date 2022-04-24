@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ESP32-WROVER-IE
+D Bluetooth, WiFi 802.11b/g/n, Bluetooth v4.2 +EDR Transceiver Module 2.4GHz ~ 2.5GHz Antenna Not Included, I-PEX Surface Mount
+K
+F https://www.espressif.com/sites/default/files/documentation/esp32-wrover-e_esp32-wrover-ie_datasheet_en.pdf
+$ENDCMP
+#
+#End Doc Library

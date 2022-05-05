@@ -4,6 +4,13 @@
 
   (paper "A4")
 
+  (title_block
+    (title "Laser controller board (Power Supply)")
+    (date "2022-05-05")
+    (rev "R0.1")
+    (company "Designed by Márk Mihalik")
+  )
+
   (lib_symbols
     (symbol "Connector:Barrel_Jack_Switch_Pin3Ring" (pin_names hide) (in_bom yes) (on_board yes)
       (property "Reference" "J" (id 0) (at 0 5.334 0)

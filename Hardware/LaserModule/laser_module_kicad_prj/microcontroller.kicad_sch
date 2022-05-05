@@ -4,6 +4,13 @@
 
   (paper "A4")
 
+  (title_block
+    (title "Laser controller board (Microcontroller)")
+    (date "2022-05-05")
+    (rev "R0.1")
+    (company "Designed by Márk Mihalik")
+  )
+
   (lib_symbols
     (symbol "Connector:Conn_01x04_Male" (pin_names (offset 1.016) hide) (in_bom yes) (on_board yes)
       (property "Reference" "J" (id 0) (at 0 5.08 0)
@@ -912,10 +919,8 @@
 
   (no_connect (at 213.995 102.235) (uuid 0bb00b64-59c9-46e4-9bed-be95e7d51ad6))
   (no_connect (at 213.995 79.375) (uuid 1a52928e-0115-4569-8923-adf15d80429b))
-  (no_connect (at 213.995 76.835) (uuid 1a52928e-0115-4569-8923-adf15d80429b))
+  (no_connect (at 213.995 76.835) (uuid 1a52928e-0115-4569-8923-adf15d80429c))
   (no_connect (at 252.095 66.675) (uuid 4fca7913-6323-44f5-bb87-e17a067e8b57))
-  (no_connect (at 213.995 71.755) (uuid 68cfcbc1-2a00-4c93-bd72-95db4b7c7ef9))
-  (no_connect (at 213.995 74.295) (uuid 68cfcbc1-2a00-4c93-bd72-95db4b7c7ef9))
   (no_connect (at 213.995 107.315) (uuid 6c5bad07-6597-499a-bbb1-65b5ba4a8e58))
   (no_connect (at 252.095 64.135) (uuid a91df222-4098-4a5f-9478-79939e44eebf))
   (no_connect (at 213.995 112.395) (uuid bd293acb-bc42-4dfc-bed8-2d9255c25ad8))
@@ -1211,6 +1216,10 @@
     (effects (font (size 1.27 1.27)) (justify left))
     (uuid 2c7712d2-0e11-403f-b650-4f3ee8674602)
   )
+  (hierarchical_label "LASER1_MD_MEAS" (shape input) (at 213.995 71.755 180)
+    (effects (font (size 1.27 1.27)) (justify right))
+    (uuid 3371d35f-bb0d-4e6c-a0e9-75aca97d4fdc)
+  )
   (hierarchical_label "PELTIER2_FWD" (shape output) (at 252.095 86.995 0)
     (effects (font (size 1.27 1.27)) (justify left))
     (uuid 34bb5063-d950-49a1-a52c-5140c9d62cd8)
@@ -1218,6 +1227,10 @@
   (hierarchical_label "LASER2_CUR_CNTR" (shape output) (at 213.995 84.455 180)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid 54da0472-b6a3-4e73-99b9-7f3294ef49ce)
+  )
+  (hierarchical_label "LASER2_MD_MEAS" (shape input) (at 213.995 74.295 180)
+    (effects (font (size 1.27 1.27)) (justify right))
+    (uuid 73fcab5d-e253-4ab7-b59d-8f4aea9f1ce7)
   )
   (hierarchical_label "LASER1_CUR_MEAS" (shape input) (at 213.995 66.675 180)
     (effects (font (size 1.27 1.27)) (justify right))

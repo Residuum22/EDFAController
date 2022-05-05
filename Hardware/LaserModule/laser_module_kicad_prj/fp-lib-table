@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name "BarrelJack3D")(type "KiCad")(uri "${KIPRJMOD}/LIB/BarrelJack3D")(options "")(descr ""))
+  (lib (name "ESP32-WROVER-IE")(type "KiCad")(uri "${KIPRJMOD}/LIB/ESP32-WROVER-IE")(options "")(descr ""))
+  (lib (name "Ribbon02x08")(type "KiCad")(uri "${KIPRJMOD}/LIB/Ribbon02x08")(options "")(descr ""))
+)

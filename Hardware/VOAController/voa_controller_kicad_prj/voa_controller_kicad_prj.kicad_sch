@@ -2859,7 +2859,7 @@
     (uuid 97dbc5d1-988a-44de-8ddf-879f6f62d34f)
     (property "Reference" "J4" (id 0) (at 252.73 40.64 0))
     (property "Value" "Conn_02x08_Odd_Even" (id 1) (at 252.73 43.18 0))
-    (property "Footprint" "Connector_IDC:IDC-Header_2x08-1MP_P2.54mm_Latch_Vertical" (id 2) (at 251.46 54.61 0)
+    (property "Footprint" "Connector_IDC:IDC-Header_2x08_P2.54mm_Latch_Vertical" (id 2) (at 251.46 54.61 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 251.46 54.61 0)
@@ -3711,7 +3711,7 @@
       (reference "J3") (unit 1) (value "Conn_ARM_JTAG_SWD_10") (footprint "Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD")
     )
     (path "/97dbc5d1-988a-44de-8ddf-879f6f62d34f"
-      (reference "J4") (unit 1) (value "Conn_02x08_Odd_Even") (footprint "Connector_IDC:IDC-Header_2x08-1MP_P2.54mm_Latch_Vertical")
+      (reference "J4") (unit 1) (value "Conn_02x08_Odd_Even") (footprint "Connector_IDC:IDC-Header_2x08_P2.54mm_Latch_Vertical")
     )
     (path "/c3aaf556-7a7f-4df7-93af-d94575a1f701"
       (reference "JP1") (unit 1) (value "Jumper_2_Open") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")

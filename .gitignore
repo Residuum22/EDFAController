@@ -27,3 +27,4 @@ fp-info-cache
 Hardware/VOAController/voa_controller_kicad_prj/voa_controller_kicad_prj-backups
 Hardware/LaserModule/laser_module_kicad_prj/laser_module_kicad_prj-backups
 Hardware/CableBoard/cable_board_kicad_prj/cable_board_kicad_prj-backups
+KiCADScript/__pycache__

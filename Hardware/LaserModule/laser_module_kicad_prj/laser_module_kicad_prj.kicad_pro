@@ -460,6 +460,18 @@
     [
       "ce041462-17b5-48cc-9456-b58f78959f2a",
       "Lazer Controll Circuit"
+    ],
+    [
+      "fcc623fa-81ef-469b-b5ac-c85bb39572dc",
+      "Power Supply and Protection"
+    ],
+    [
+      "d26e52bb-d49d-4392-b6c1-75e6ed0986ad",
+      "DC-DC Converter 1"
+    ],
+    [
+      "99138f2f-75a2-45b4-837e-b8f0811ad78f",
+      "DC-DC Converter 2"
     ]
   ],
   "text_variables": {}

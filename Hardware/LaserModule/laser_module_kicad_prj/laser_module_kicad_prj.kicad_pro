@@ -45,7 +45,7 @@
         "silk_text_upright": false,
         "zones": {
           "45_degree_only": false,
-          "min_clearance": 0.19999999999999998
+          "min_clearance": 0.0
         }
       },
       "diff_pair_dimensions": [
@@ -123,6 +123,7 @@
         0.3,
         0.5,
         0.7,
+        0.8,
         1.0
       ],
       "via_dimensions": [
@@ -454,6 +455,10 @@
       ""
     ],
     [
+      "a8b7bc32-dbdb-4e6a-ad65-136f99c51162",
+      "DC-DC Converter 1"
+    ],
+    [
       "ee492bf7-0fa8-4c81-8df6-fe8bf3d6a47f",
       "Mikrocontroller"
     ],
@@ -463,14 +468,14 @@
     ],
     [
       "fcc623fa-81ef-469b-b5ac-c85bb39572dc",
-      "Power Supply and Protection"
+      "Power Supply Protection 1"
     ],
     [
-      "d26e52bb-d49d-4392-b6c1-75e6ed0986ad",
-      "DC-DC Converter 1"
+      "93fee5a2-e368-4e5e-b2f5-84fa182a3b5a",
+      "Power Supply Protection 2"
     ],
     [
-      "99138f2f-75a2-45b4-837e-b8f0811ad78f",
+      "ff06acb3-81ff-4561-b7e3-3b9aa0875d41",
       "DC-DC Converter 2"
     ]
   ],

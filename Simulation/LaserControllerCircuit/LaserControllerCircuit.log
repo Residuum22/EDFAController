@@ -1,58 +1,22 @@
-Circuit: * D:\development\1EDFAcontroller\Simulation\LTSpice\LaserControllerCircuit\LaserControllerCircuit.asc
+Circuit: * D:\development\1EDFAcontroller\Simulation\LaserControllerCircuit\LaserControllerCircuit.asc
 
 Limiting fall time of source v4 to 3.5
-Direct Newton iteration failed to find .op point.  (Use ".option noopiter" to skip.)
-Starting Gmin stepping
-Gmin = 10
-Gmin = 1.07374
-Gmin = 0.115292
-Gmin = 0.0123794
-Gmin = 0.00132923
-Gmin = 0.000142725
-Gmin = 1.5325e-005
-Gmin = 1.6455e-006
-Gmin = 1.76685e-007
-Gmin = 1.89714e-008
-Gmin = 2.03704e-009
-Gmin = 2.18725e-010
-Gmin = 2.34854e-011
-Gmin = 2.52173e-012
-Gmin = 2.70769e-013
-vernier = 0.5
-vernier = 0.25
-vernier = 0.125
-Gmin = 1.69039e-013
-vernier = 0.0625
-vernier = 0.03125
-vernier = 0.015625
-vernier = 0.0208333
-Gmin = 1.64917e-013
-vernier = 0.0104167
-vernier = 0.00520833
-Gmin = 1.62365e-013
-vernier = 0.00260417
-vernier = 0.00130208
-vernier = 0.000651042
-vernier = 0.000488281
-Gmin = 1.62094e-013
-Gmin = 0
-Gmin stepping succeeded in finding the operating point.
+Direct Newton iteration for .op point succeeded.
 
-
-Date: Sat Oct 08 12:17:23 2022
-Total elapsed time: 0.948 seconds.
+Date: Mon Oct 17 14:12:11 2022
+Total elapsed time: 0.194 seconds.
 
 tnom = 27
 temp = 27
 method = modified trap
-totiter = 6968
-traniter = 3737
-tranpoints = 1784
-accept = 1766
-rejected = 18
-matrix size = 26
-fillins = 62
+totiter = 3624
+traniter = 3577
+tranpoints = 1750
+accept = 1742
+rejected = 8
+matrix size = 24
+fillins = 13
 solver = Normal
-Matrix Compiler1: 4.96 KB object code size  1.5/1.0/[0.5]
-Matrix Compiler2: 3.21 KB object code size  0.8/0.8/[0.5]
+Matrix Compiler1: 1.56 KB object code size  0.5/0.3/[0.2]
+Matrix Compiler2: 2.16 KB object code size  0.3/0.4/[0.2]
 

@@ -1857,7 +1857,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 86.36 66.675 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 799d2512-5c32-45ff-94ac-8ca827385809)
-    (property "Reference" "TP?" (id 0) (at 88.9 62.1029 0)
+    (property "Reference" "TP1" (id 0) (at 88.9 62.1029 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TP_GND" (id 1) (at 88.9 64.6429 0)
@@ -2241,7 +2241,7 @@
   (symbol (lib_id "power:GND") (at 86.36 66.675 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid f79355d6-ac01-455f-9653-7343bfee6e40)
-    (property "Reference" "#PWR?" (id 0) (at 86.36 73.025 0)
+    (property "Reference" "#PWR06" (id 0) (at 86.36 73.025 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (id 1) (at 84.455 71.12 0)
@@ -2502,6 +2502,9 @@
     (path "/92552bc8-b60e-4023-80b5-b229b094af2e"
       (reference "#PWR05") (unit 1) (value "+3V3") (footprint "")
     )
+    (path "/f79355d6-ac01-455f-9653-7343bfee6e40"
+      (reference "#PWR06") (unit 1) (value "GND") (footprint "")
+    )
     (path "/2738196a-35d6-47a0-86ac-6e66aac10db3"
       (reference "#PWR08") (unit 1) (value "GND") (footprint "")
     )
@@ -2732,9 +2735,6 @@
     )
     (path "/ce041462-17b5-48cc-9456-b58f78959f2a/5c27e21b-96e5-43fd-a738-95482b40b357"
       (reference "#PWR0110") (unit 1) (value "+5V") (footprint "")
-    )
-    (path "/f79355d6-ac01-455f-9653-7343bfee6e40"
-      (reference "#PWR?") (unit 1) (value "GND") (footprint "")
     )
     (path "/360d4fff-6f4d-4a93-889b-6928f95144f1"
       (reference "C1") (unit 1) (value "10u") (footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder")
@@ -3018,20 +3018,20 @@
     (path "/af3eea24-1adb-4254-a151-5606ac17df53"
       (reference "TH1") (unit 1) (value "Thermistor_NTC") (footprint "")
     )
-    (path "/ce041462-17b5-48cc-9456-b58f78959f2a/16ea58e6-9828-4c93-b5c9-7fd50a8b4c8b"
-      (reference "TP?") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_D2.5mm")
-    )
-    (path "/ce041462-17b5-48cc-9456-b58f78959f2a/1c05f0ac-35da-49df-bdec-d4cad246cd49"
-      (reference "TP?") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_D2.5mm")
-    )
     (path "/799d2512-5c32-45ff-94ac-8ca827385809"
-      (reference "TP?") (unit 1) (value "TP_GND") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical")
-    )
-    (path "/ff06acb3-81ff-4561-b7e3-3b9aa0875d41/bc48d1f3-b07a-42c5-bf75-83cbac4fea87"
-      (reference "TP?") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_D2.5mm")
+      (reference "TP1") (unit 1) (value "TP_GND") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical")
     )
     (path "/a8b7bc32-dbdb-4e6a-ad65-136f99c51162/bc48d1f3-b07a-42c5-bf75-83cbac4fea87"
-      (reference "TP?") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_D2.5mm")
+      (reference "TP2") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_D2.5mm")
+    )
+    (path "/ce041462-17b5-48cc-9456-b58f78959f2a/16ea58e6-9828-4c93-b5c9-7fd50a8b4c8b"
+      (reference "TP3") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_D2.5mm")
+    )
+    (path "/ce041462-17b5-48cc-9456-b58f78959f2a/1c05f0ac-35da-49df-bdec-d4cad246cd49"
+      (reference "TP4") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_D2.5mm")
+    )
+    (path "/ff06acb3-81ff-4561-b7e3-3b9aa0875d41/bc48d1f3-b07a-42c5-bf75-83cbac4fea87"
+      (reference "TP5") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_D2.5mm")
     )
     (path "/5f1c1ff9-55de-45fd-88f4-642c821180b0"
       (reference "U1") (unit 1) (value "IFX27001TFV33") (footprint "Package_TO_SOT_SMD:TO-252-3_TabPin2")

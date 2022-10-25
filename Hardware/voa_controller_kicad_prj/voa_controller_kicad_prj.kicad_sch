@@ -1982,7 +1982,7 @@
   (symbol (lib_id "power:GND") (at 120.65 34.29 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 03dbce05-3ff8-440b-8339-36ed7ecc55b8)
-    (property "Reference" "#PWR?" (id 0) (at 120.65 40.64 0)
+    (property "Reference" "#PWR0111" (id 0) (at 120.65 40.64 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (id 1) (at 120.65 38.735 0))
@@ -3295,7 +3295,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 120.65 34.29 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid e753ce67-cb56-42f0-a3cb-c1a35f060ac2)
-    (property "Reference" "TP?" (id 0) (at 116.84 26.67 0)
+    (property "Reference" "TP1" (id 0) (at 116.84 26.67 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (id 1) (at 116.84 29.21 0)
@@ -3638,7 +3638,7 @@
       (reference "#PWR0110") (unit 1) (value "GND") (footprint "")
     )
     (path "/03dbce05-3ff8-440b-8339-36ed7ecc55b8"
-      (reference "#PWR?") (unit 1) (value "GND") (footprint "")
+      (reference "#PWR0111") (unit 1) (value "GND") (footprint "")
     )
     (path "/cc9a9312-38fc-4d00-b848-012061dcb89c"
       (reference "C1") (unit 1) (value "22u") (footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder")
@@ -3755,7 +3755,7 @@
       (reference "SW1") (unit 1) (value "SW_Push") (footprint "Button_Switch_THT:SW_PUSH_6mm_H7.3mm")
     )
     (path "/e753ce67-cb56-42f0-a3cb-c1a35f060ac2"
-      (reference "TP?") (unit 1) (value "TestPoint") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical")
+      (reference "TP1") (unit 1) (value "TestPoint") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical")
     )
     (path "/71bde7f6-c970-4790-a48c-3a26a72d30aa/d6e047fd-eab7-4db3-8b54-409bdd5ef572"
       (reference "U1") (unit 1) (value "IFX27001TFV33") (footprint "Package_TO_SOT_SMD:TO-252-3_TabPin2")

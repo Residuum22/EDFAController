@@ -1,2 +1,3 @@
 fastapi>=0.92
 uvicorn>=0.20
+jinja2>=3.1

@@ -39,3 +39,6 @@ sym-lib-table
 # VSCode .vscode
 extensions.json
 settings.json
+
+# Log files
+*.log

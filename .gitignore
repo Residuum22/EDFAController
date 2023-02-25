@@ -6,6 +6,7 @@
 *.bak
 *.bck
 *.kicad_pcb-bak
+*.kicad_sch-bak
 *.sch-bak
 *~
 _autosave-*
@@ -13,6 +14,14 @@ _autosave-*
 *-save.pro
 *-save.kicad_pcb
 fp-info-cache
+fp-lib-table
+sym-lib-table
+
+# Backups
+*-backups
+
+# Local kicad files
+*.kicad_prl
 
 # Netlist files (exported from Eeschema)
 *.net
@@ -23,7 +32,10 @@ fp-info-cache
 
 # Exported BOM files
 *.xml
-Hardware/voa_controller_kicad_prj/voa_controller_kicad_prj-backups
-Hardware/laser_module_kicad_prj/laser_module_kicad_prj-backups
-Hardware/cable_board_kicad_prj/cable_board_kicad_prj-backups
-KiCADScript/__pycache__
+
+# Pycache
+*.pyc
+
+# VSCode .vscode
+extensions.json
+settings.json

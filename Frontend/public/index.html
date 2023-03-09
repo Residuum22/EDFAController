@@ -12,14 +12,14 @@
   <!-- Bootstrap CSS -->
 
   <title>EDFA - Vezérlőpult</title>
-  <!-- <link rel="shortcut icon" href="favicon.ico?v=" /> -->
+  <link rel="shortcut icon" href="./assets/img/laser_icon.png" />
 </head>
 
 <header>
   <nav class="navbar bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
-        <img src="/static/img/laser_icon.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+        <img src="./assets/img/laser_icon.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
         EDFA - Vezérlőpult
       </a>
     </div>
@@ -35,19 +35,19 @@
             <h5 class="card-title text-center">VOA</h5>
             <div class="row mt-3">
               <div class="col-sm-8">
-                <p class="card-text">
-                  Position: 6°
+                <p class="card-text" id="voa_pos">
+                  Position: 0°
                 </p>
               </div>
               <div class="col">
                 <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary">+</button>
-                  <button type="button" class="btn btn-secondary">-</button>
+                  <button type="button" class="btn btn-secondary" onclick="increment_voa_pos()">+</button>
+                  <button type="button" class="btn btn-secondary" onclick="decrement_voa_pos()">-</button>
                 </div>
               </div>
             </div>
             <div class="text-center mt-3">
-              <button type="button" class="btn btn-primary ">Reset position</button>
+              <button type="button" class="btn btn-primary" onclick="reset_voa_position()">Reset position</button>
             </div>
           </div>
         </div>
@@ -57,8 +57,8 @@
           <div class="card-body">
             <h5 class="card-title text-center">Laser modul 1</h5>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-              <label class="form-check-label" for="flexSwitchCheckDefault">Enable/Disable module</label>
+              <input class="form-check-input" type="checkbox" role="switch" id="laser1_on_off_switch">
+              <label class="form-check-label" for="laser1_on_off_switch">Enable/Disable module</label>
             </div>
             <p class="card-text">
               Temperature: 22°
@@ -195,16 +195,17 @@
       </div>
     </div>
   </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
-crossorigin="anonymous"></script>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"></script>
+  <script src="../static/events.js"></script>
 </body>
 
 <div style="clear: both; height: 60px;">
-<footer class="footer fixed-bottom">
-  <div class="my-3"></div>
-  <div class="text-center p-3 bg-light">©Mihalik Márk 2023</div>
-</footer>
+  <footer class="footer fixed-bottom">
+    <div class="my-3"></div>
+    <div class="text-center p-3 bg-light">©Mihalik Márk 2023</div>
+  </footer>
 
 </html>

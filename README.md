@@ -3,6 +3,15 @@
 ## Getting started
 
 To start webserver run this command:
+
+
+UNIX
 ```bash
-cd src && uvicorn.exe main:app --reload
+python3 ./main.py
 ```
+
+Windows
+```bash
+py ./main.py
+```
+

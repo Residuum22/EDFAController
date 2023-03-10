@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+
 
 #------------------------------------------------------------------------------
 # Models
@@ -39,6 +40,7 @@ voa_data_instance = voa_data(position=0)
 #------------------------------------------------------------------------------
 app = FastAPI()
 templates = Jinja2Templates(directory="public") # Future use
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.on_event("startup")
 async def startup():

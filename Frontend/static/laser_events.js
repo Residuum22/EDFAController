@@ -1,4 +1,4 @@
-const laser_max_temp_offset = 5
+const laser_max_temp_offset = 20
 
 function enable_disable_laser(laser_id) {
     let laser_name = "laser" + laser_id + "_on_off_switch";
@@ -46,7 +46,7 @@ function increment_laser_current(laser_id) {
         current_pos_int = current_pos_int + laser_max_temp_offset;
     }
 
-    document.getElementById(laser_name).innerHTML = "Maximum Laser diode current: ~" + current_pos_int + "mA";
+    document.getElementById(laser_name).innerHTML = "Laser diode current: ~" + current_pos_int + "mA";
 }
 
 function decrement_laser_current(laser_id) {
@@ -58,7 +58,7 @@ function decrement_laser_current(laser_id) {
         current_pos_int = current_pos_int - laser_max_temp_offset;
     }
 
-    document.getElementById(laser_name).innerHTML = "Maximum Laser diode current: ~" + current_pos_int + "mA";
+    document.getElementById(laser_name).innerHTML = "Laser diode current: ~" + current_pos_int + "mA";
 }
 
 function laser_emergency_stop() {

@@ -3,7 +3,7 @@
 <!-- the page starts here -->
 
 <head>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+  <link href="npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   <!-- Required meta tags -->
   <meta charset="utf-8" />
@@ -30,7 +30,7 @@
   <div class="container">
     <div class="row mt-3">
       <div class="col mt-3">
-        <div class="card text-right" style="width: 24rem;">
+        <div class="card text-right" style="width: 32rem;">
           <div class="card-body">
             <h5 class="card-title text-center">VOA</h5>
             <div class="row mt-3">
@@ -53,7 +53,7 @@
         </div>
       </div>
       <div class="col mt-3">
-        <div class="card" style="width: 24rem;">
+        <div class="card" style="width: 32rem;">
           <div class="card-body">
             <h5 class="card-title text-center">Laser modul 1</h5>
             <div class="form-check form-switch">
@@ -100,7 +100,7 @@
         </div>
       </div>
       <div class="col mt-3">
-        <div class="card" style="width: 24rem;">
+        <div class="card" style="width: 32rem;">
           <div class="card-body">
             <h5 class="card-title text-center">Laser modul 2</h5>
             <div class="form-check form-switch">
@@ -124,12 +124,12 @@
               </div>
             </div>
 
-            <p class="card-text">
+            <p class="card-text" id="laser2_monitor_diode">
               Monitor diode: 0
             </p>
             <div class="row">
               <div class="col-sm-8">
-                <p class="card-text">
+                <p class="card-text" id="laser2_current">
                   Laser diode current: ~0 mA
                 </p>
               </div>
@@ -147,7 +147,7 @@
         </div>
       </div>
       <div class="col mt-3">
-        <div class="card" style="width: 24rem;">
+        <div class="card" style="width: 32rem;">
           <div class="card-body">
             <h5 class="card-title text-center">Laser modul 3</h5>
             <div class="form-check form-switch">
@@ -171,12 +171,12 @@
               </div>
             </div>
 
-            <p class="card-text">
+            <p class="card-text" id="laser3_monitor_diode">
               Monitor diode: 0
             </p>
             <div class="row">
               <div class="col-sm-8">
-                <p class="card-text">
+                <p class="card-text" id="laser3_current">
                   Laser diode current: ~0 mA
                 </p>
               </div>
@@ -196,7 +196,7 @@
     </div>
   </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+  <script src="/npm/bootstrap/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
     crossorigin="anonymous"></script>
     <script src="/static/voa_events.js"></script>

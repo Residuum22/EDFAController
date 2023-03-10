@@ -43,6 +43,7 @@ templates = Jinja2Templates(directory="Frontend/public") # Future use
 app.mount("/static", StaticFiles(directory="Frontend/static"), name="static")
 app.mount("/public", StaticFiles(directory="Frontend/public"), name="public")
 app.mount("/img", StaticFiles(directory="Frontend/public/assets/img"), name="img")
+app.mount("/npm", StaticFiles(directory="Frontend/node_modules"), name="npm")
 
 @app.on_event("startup")
 async def startup():

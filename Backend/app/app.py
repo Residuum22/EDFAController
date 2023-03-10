@@ -39,8 +39,10 @@ voa_data_instance = voa_data(position=0)
 # FastAPI, jinja2
 #------------------------------------------------------------------------------
 app = FastAPI()
-templates = Jinja2Templates(directory="public") # Future use
-app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="Frontend/public") # Future use
+app.mount("/static", StaticFiles(directory="Frontend/static"), name="static")
+app.mount("/public", StaticFiles(directory="Frontend/public"), name="public")
+app.mount("/img", StaticFiles(directory="Frontend/public/assets/img"), name="img")
 
 @app.on_event("startup")
 async def startup():

@@ -1,7 +1,5 @@
 from fastapi.testclient import TestClient
-from fastapi import WebSocket
-
-from app.main import app
+from app.app import app
 
 client = TestClient(app)
 

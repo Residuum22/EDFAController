@@ -1,12 +1,24 @@
 const laser_max_temp_offset = 20
+const url = "http://localhost:8000"
 
 function enable_disable_laser(laser_id) {
-    let laser_name = "laser" + laser_id + "_on_off_switch";
+    let laser_name = "laser_module" + laser_id + "_on_off_switch";
     let state = document.getElementById(laser_name).checked;
+    let myBody
     if (state == true)
-        console.log("Enabling laser")
+        myBody = {"status": true}
     else
-        console.log("Disabling laser")
+        myBody = {"status": false}
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            //alert(this.responseText);
+        }
+    };
+    xhttp.open("POST", url + "/set_laser" + laser_id + "_data", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(JSON.stringify(myBody));
 }
 
 function update_laser_temp(temp, laser_id) {

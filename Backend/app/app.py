@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
-
 #------------------------------------------------------------------------------
 # Models
 #------------------------------------------------------------------------------
@@ -16,6 +15,9 @@ class laser_data(BaseModel):
     
 class voa_data(BaseModel):
     position: int
+    
+class laser_enable(BaseModel):
+    status: bool
     
     
 #------------------------------------------------------------------------------
@@ -77,7 +79,29 @@ async def get_laser3_data() -> list[laser_data]:
 async def get_voa_data() -> voa_data:
     return voa_data_instance
 
+@app.post("/set_laser1_data")
+async def get_voa_data(laser1_data: laser_enable):
+    if (laser1_data.status):
+        print("Enabling laser1 module")
+    else:
+        print("Disabling laser1 module")
+    return
 
+@app.post("/set_laser2_data")
+async def get_voa_data(laser2_data: laser_enable):
+    if (laser2_data.status):
+        print("Enabling laser2 module")
+    else:
+        print("Disabling laser2 module")
+    return
+
+@app.post("/set_laser3_data")
+async def get_voa_data(laser3_data: laser_enable):
+    if (laser3_data.status):
+        print("Enabling laser3 module")
+    else:
+        print("Disabling laser3 module")
+    return
 #------------------------------------------------------------------------------
 # Websocket
 #------------------------------------------------------------------------------

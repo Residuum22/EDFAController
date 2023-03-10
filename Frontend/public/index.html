@@ -3,8 +3,7 @@
 <!-- the page starts here -->
 
 <head>
-  <link href="npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <link href="npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
   <!-- Required meta tags -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -57,8 +56,9 @@
           <div class="card-body">
             <h5 class="card-title text-center">Laser modul 1</h5>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="laser1_on_off_switch" onclick="enable_disable_laser(1)">
-              <label class="form-check-label" for="laser1_on_off_switch">Enable/Disable module</label>
+              <input class="form-check-input" type="checkbox" role="switch" id="laser_module1_on_off_switch"
+                onclick="enable_disable_laser(1)">
+              <label class="form-check-label" for="laser_module_1_on_off_switch">Enable/Disable module</label>
             </div>
             <p class="card-text" id="laser1_temp">
               Temperature: 0°
@@ -104,8 +104,9 @@
           <div class="card-body">
             <h5 class="card-title text-center">Laser modul 2</h5>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="laser2_on_off_switch" onclick="enable_disable_laser(2)">
-              <label class="form-check-label" for="laser2_on_off_switch">Enable/Disable module</label>
+              <input class="form-check-input" type="checkbox" role="switch" id="laser_module2_on_off_switch"
+                onclick="enable_disable_laser(2)">
+              <label class="form-check-label" for="laser_module_2_on_off_switch">Enable/Disable module</label>
             </div>
             <p class="card-text" id="laser2_temp">
               Temperature: 0°
@@ -151,8 +152,9 @@
           <div class="card-body">
             <h5 class="card-title text-center">Laser modul 3</h5>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="laser3_on_off_switch" onclick="enable_disable_laser(3)">
-              <label class="form-check-label" for="laser3_on_off_switch">Enable/Disable module</label>
+              <input class="form-check-input" type="checkbox" role="switch" id="laser_module3_on_off_switch"
+                onclick="enable_disable_laser(3)">
+              <label class="form-check-label" for="laser_module_3_on_off_switch">Enable/Disable module</label>
             </div>
             <p class="card-text" id="laser3_temp">
               Temperature: 0°
@@ -196,11 +198,9 @@
     </div>
   </div>
   </div>
-  <script src="/npm/bootstrap/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
-    crossorigin="anonymous"></script>
-    <script src="/static/voa_events.js"></script>
-    <script src="/static/laser_events.js"></script>
+  <script src="/npm/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="/static/voa_events.js"></script>
+  <script src="/static/laser_events.js"></script>
 </body>
 
 <div style="clear: both; height: 60px;">

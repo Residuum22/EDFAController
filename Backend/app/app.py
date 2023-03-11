@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Depends, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from time import time
+
+import time
 import json
 import asyncio
 
@@ -174,6 +175,22 @@ async def set_laser_module_desired_temperature(id: int, desired_temperature: int
 # Websocket Start
 # ------------------------------------------------------------------------------
 
+# Websocket for frontend
+
+@app.websocket("/frontend_get_module_data")
+async def websocket_frontend_get_all_module_data(websocket: WebSocket):
+    await websocket.accept()
+    global frontend_websocket
+    frontend_websocket = websocket
+    try:
+        while True:
+            _ = await websocket.receive_text()
+
+    except WebSocketDisconnect:
+        return
+
+    finally:
+        frontend_websocket = None
 
 # Websocket for esp32
 
@@ -183,15 +200,17 @@ async def websocket_laser1_data(websocket: WebSocket):
     try:
         while True:
             json_data = await websocket.receive_json()
-            json_data["time_stamp"] = time()
+            json_data["time_stamp"] = time.time()
             match json_data["module_number"]:
                 case 1:
                     laser_module_1_report = json_data
+                    websocket_send_data(frontend_websocket, laser_module_1_report.json())
                 case 2:
                     laser_module_2_report = json_data
+                    websocket_send_data(frontend_websocket, laser_module_2_report.json())
                 case 3:
                     laser_module_3_report = json_data
-            # TODO send data to frontend with websocket
+                    websocket_send_data(frontend_websocket, laser_module_3_report.json())
     except WebSocketDisconnect:
         return
 

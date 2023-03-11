@@ -1,4 +1,6 @@
-﻿# Backend
+﻿.vscode
+
+# Backend
 *.pyc
 
 # Frontend

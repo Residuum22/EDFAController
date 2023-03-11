@@ -15,7 +15,7 @@ function post_call(url, json_body, callback) {
     xhttp.send(JSON.stringify(json_body));
 }
 
-function enable_disable_laser(laser_id) {
+function enable_disable_laser_module(laser_id) {
     let laser_name = "laser_module" + laser_id + "_on_off_switch";
     let state = document.getElementById(laser_name).checked;
     let url = "/enable_disable_laser_module/" + laser_id + "?" + "state="+ state 

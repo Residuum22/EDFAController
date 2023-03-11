@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Depends, Request, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from time import time
 import json
+import asyncio
 
 # ------------------------------------------------------------------------------
 # Models
@@ -35,12 +36,8 @@ class laser_module_data_report(BaseModel):
     laser_1480: laser_data_report
 
 
-class voa_data(BaseModel):
+class voa_module_data_set(BaseModel):
     attenuation: int
-
-
-class board_status(BaseModel):
-    status: str
 
 
 # ------------------------------------------------------------------------------
@@ -75,6 +72,16 @@ laser_module_2_set = laser_module_data_set(enabled=False, report_interval=1, las
 
 laser_module_3_set = laser_module_data_set(enabled=False, report_interval=1, laser_976={
                                            "desired_temperature": 50, "desired_monitor_diode_current": 0}, laser_1480={"desired_temperature": 50, "desired_monitor_diode_current": 0})
+
+voa_module_set = voa_module_data_set(attenuation=0)
+
+
+async def websocket_send_data(ws: WebSocket, data: json):
+    try:
+        if ws is not None:
+            await asyncio.wait_for(ws.send_json(data), timeout=1.0)
+    except Exception:
+        return
 # ------------------------------------------------------------------------------
 # Instances
 # FastAPI, jinja2
@@ -97,7 +104,11 @@ async def shutdown():
     print("Server closing...")
 
 # ------------------------------------------------------------------------------
-# HTTP
+# Instances end
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# HTTP Start
 # ------------------------------------------------------------------------------
 
 
@@ -123,45 +134,55 @@ async def enable_disable_laser_module(id: int, state: bool):
     match id:
         case 1:
             laser_module_1_set.enabled = state
+            await websocket_send_data(laser_module_1_websocket,
+                                laser_module_1_set.json())
         case 2:
             laser_module_2_set.enabled = state
+            await websocket_send_data(laser_module_2_websocket,
+                                laser_module_2_set.json())
         case 3:
             laser_module_3_set.enabled = state
-
-    # TODO httpx send data to esp32
+            await websocket_send_data(laser_module_3_websocket,
+                                laser_module_3_set.json())
     return
 
 
 @app.post("/set_laser_module_desired_temperature/{id}")
-async def set_laser_module_desired_temperature(id: int, desired_temperature: int) -> board_status:
-    if desired_temperature not in range(30, 70):
-        return board_status(status="ERROR")
+async def set_laser_module_desired_temperature(id: int, desired_temperature: int):
+    if desired_temperature not in range(29, 71):
+        return
     match id:
         case 1:
             laser_module_1_set.laser_976.desired_temperature = desired_temperature
             laser_module_1_set.laser_1480.desired_temperature = desired_temperature
-            # TODO httpx send data
+            await websocket_send_data(laser_module_1_websocket,
+                                laser_module_1_set.json())
         case 2:
             laser_module_2_set.laser_976.desired_temperature = desired_temperature
             laser_module_2_set.laser_1480.desired_temperature = desired_temperature
-            # TODO httpx send data
+            await websocket_send_data(laser_module_2_websocket,
+                                laser_module_2_set.json())
         case 3:
             laser_module_3_set.laser_976.desired_temperature = desired_temperature
             laser_module_3_set.laser_1480.desired_temperature = desired_temperature
-            # TODO httpx send data
-    return board_status(status="OK")
+            await websocket_send_data(laser_module_3_websocket,
+                                laser_module_3_set.json())
 # ------------------------------------------------------------------------------
-# Websocket
+# HTTP End
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Websocket Start
 # ------------------------------------------------------------------------------
 
+
+# Websocket for esp32
 
 @app.websocket("/report_laser_module_data")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
-            data = await websocket.receive_text()
-            json_data = json.loads(data)
+            json_data = await websocket.receive_json()
             json_data["time_stamp"] = time()
             match json_data["module_number"]:
                 case 1:
@@ -170,6 +191,73 @@ async def websocket_laser1_data(websocket: WebSocket):
                     laser_module_2_report = json_data
                 case 3:
                     laser_module_3_report = json_data
-            # add
+            # TODO send data to frontend with websocket
     except WebSocketDisconnect:
         return
+
+
+@app.websocket("/set_laser_module_1")
+async def websocket_laser1_data(websocket: WebSocket):
+    await websocket.accept()
+    global laser_module_1_websocket
+    laser_module_1_websocket = websocket
+    try:
+        while True:
+            _ = await websocket.receive_text()
+
+    except WebSocketDisconnect:
+        return
+
+    finally:
+        laser_module_1_websocket = None
+
+
+@app.websocket("/set_laser_module_2")
+async def websocket_laser1_data(websocket: WebSocket):
+    await websocket.accept()
+    global laser_module_2_websocket
+    laser_module_2_websocket = websocket
+    try:
+        while True:
+            _ = await websocket.receive_text()
+
+    except WebSocketDisconnect:
+        return
+
+    finally:
+        laser_module_2_websocket = None
+
+
+@app.websocket("/set_laser_module_3")
+async def websocket_laser1_data(websocket: WebSocket):
+    await websocket.accept()
+    global laser_module_3_websocket
+    laser_module_3_websocket = websocket
+    try:
+        while True:
+            _ = await websocket.receive_text()
+
+    except WebSocketDisconnect:
+        return
+
+    finally:
+        laser_module_3_websocket = None
+
+
+@app.websocket("/set_voa_module")
+async def websocket_laser1_data(websocket: WebSocket):
+    await websocket.accept()
+    global voa_module_websocket
+    voa_module_websocket = websocket
+    try:
+        while True:
+            _ = await websocket.receive_text()
+
+    except WebSocketDisconnect:
+        return
+
+    finally:
+        voa_module_websocket = None
+# ------------------------------------------------------------------------------
+# Websocket End
+# ------------------------------------------------------------------------------

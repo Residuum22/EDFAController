@@ -31,22 +31,22 @@
       <div class="col mt-3">
         <div class="card text-right" style="width: 32rem;">
           <div class="card-body">
-            <h5 class="card-title text-center">VOA</h5>
+            <h5 class="card-title text-center">VOA (Variable Optical Attenuator)</h5>
             <div class="row mt-3">
               <div class="col-sm-8">
-                <p class="card-text" id="voa_pos">
-                  Position: 0°
+                <p class="card-text" id="voa_attenuation">
+                  Csillapítás: 0 dB
                 </p>
               </div>
               <div class="col">
                 <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary" onclick="increment_voa_pos()">+</button>
-                  <button type="button" class="btn btn-secondary" onclick="decrement_voa_pos()">-</button>
+                  <button type="button" class="btn btn-secondary" onclick="increment_voa_attenuation()">+</button>
+                  <button type="button" class="btn btn-secondary" onclick="decrement_voa_attenuation()">-</button>
                 </div>
               </div>
             </div>
             <div class="text-center mt-3">
-              <button type="button" class="btn btn-primary" onclick="reset_voa_position()">Reset position</button>
+              <button type="button" class="btn btn-primary" onclick="reset_voa_attenuation()">Alaphelyzetbe állítás</button>
             </div>
           </div>
         </div>
@@ -54,11 +54,11 @@
       <div class="col mt-3">
         <div class="card" style="width: 32rem;">
           <div class="card-body">
-            <h5 class="card-title text-center">Laser modul 1</h5>
+            <h5 class="card-title text-center">Lézer modul 1</h5>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="laser_module1_on_off_switch"
-                onclick="enable_disable_laser(1)">
-              <label class="form-check-label" for="laser_module_1_on_off_switch">Enable/Disable module</label>
+                onclick="enable_disable_laser_module(1)">
+              <label class="form-check-label" for="laser_module_1_on_off_switch">Modul engedélyezése/tiltása</label>
             </div>
             <p class="card-text" id="laser1_temp">
               Temperature: 0°
@@ -105,7 +105,7 @@
             <h5 class="card-title text-center">Laser modul 2</h5>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="laser_module2_on_off_switch"
-                onclick="enable_disable_laser(2)">
+                onclick="enable_disable_laser_module(2)">
               <label class="form-check-label" for="laser_module_2_on_off_switch">Enable/Disable module</label>
             </div>
             <p class="card-text" id="laser2_temp">
@@ -153,7 +153,7 @@
             <h5 class="card-title text-center">Laser modul 3</h5>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="laser_module3_on_off_switch"
-                onclick="enable_disable_laser(3)">
+                onclick="enable_disable_laser_module(3)">
               <label class="form-check-label" for="laser_module_3_on_off_switch">Enable/Disable module</label>
             </div>
             <p class="card-text" id="laser3_temp">

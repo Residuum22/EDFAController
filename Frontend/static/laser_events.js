@@ -18,14 +18,8 @@ function post_call(url, json_body, callback) {
 function enable_disable_laser(laser_id) {
     let laser_name = "laser_module" + laser_id + "_on_off_switch";
     let state = document.getElementById(laser_name).checked;
-    let myBody
-    if (state == true)
-        myBody = {"status": true}
-    else
-        myBody = {"status": false}
-
-    let url = "/set_laser" + laser_id + "_data"
-    post_call(url, myBody, null);
+    let url = "/enable_disable_laser_module/" + laser_id + "?" + "state="+ state 
+    post_call(url, null, null);
 }
 
 function update_laser_temp(temp, laser_id) {

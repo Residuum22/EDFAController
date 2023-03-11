@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from time import time
+import json
 
 #------------------------------------------------------------------------------
 # Models
@@ -14,31 +16,29 @@ class laser_data(BaseModel):
     
 class laser_module(BaseModel):
     enabled: bool
-    time_stamp: int
+    module_number: int
+    time_stamp: float
     laser_976: laser_data
     laser_1480: laser_data
     
 class voa_data(BaseModel):
     time_stamp: int
     position: int
-    
-class laser_enable(BaseModel):
-    status: bool
 
 #------------------------------------------------------------------------------
 # Public -> database later
 #------------------------------------------------------------------------------
-laser_module_1 = laser_module(enabled=False, time_stamp=0, 
+laser_module_1 = laser_module(enabled=False, module_number=1, time_stamp=0, 
                               laser_976={"temp": 0, "max_temp": 0, "monitor_diode_current": 0, "laser_current": 0}, 
                               laser_1480={"temp": 0, "max_temp": 0, "monitor_diode_current": 0, "laser_current": 0}
                               )
 
-laser_module_2 = laser_module(enabled=False, time_stamp=0, 
+laser_module_2 = laser_module(enabled=False, module_number=2, time_stamp=0, 
                               laser_976={"temp": 0, "max_temp": 0, "monitor_diode_current": 0, "laser_current": 0}, 
                               laser_1480={"temp": 0, "max_temp": 0, "monitor_diode_current": 0, "laser_current": 0}
                               )
 
-laser_module_3 = laser_module(enabled=False, time_stamp=0, 
+laser_module_3 = laser_module(enabled=False, module_number=3, time_stamp=0, 
                               laser_976={"temp": 0, "max_temp": 0, "monitor_diode_current": 0, "laser_current": 0}, 
                               laser_1480={"temp": 0, "max_temp": 0, "monitor_diode_current": 0, "laser_current": 0}
                               )
@@ -68,103 +68,62 @@ async def shutdown():
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/get_laser1_data")
-async def get_laser1_data() -> laser_module:
-    return laser_module_1
-            
-@app.get("/get_laser2_data")
-async def get_laser2_data() -> laser_module:
-    return laser_module_2
-
-@app.get("/get_laser3_data")
-async def get_laser3_data() -> laser_module:
-    return laser_module_3
-
 @app.get("/get_voa_data")
 async def get_voa_data() -> voa_data:
     return 
 
-@app.post("/set_laser1_data")
-async def set_laser1_data(laser1_data: laser_enable):
-    if (laser1_data.status):
-        print("Enabling laser1 module")
-        laser_module_1.enabled = True
-    else:
-        print("Disabling laser1 module")
-        laser_module_1.enabled = False
-    print("Laser state:" + str(laser_module_1.enabled))
-    return
+@app.get("/get_laser_module_data/{id}")
+async def get_laser_module_data(id: int):
+    match id:
+        case 1:
+            return laser_module_1
+        case 2:
+            return laser_module_2
+        case 3:
+            return laser_module_3
 
-@app.post("/set_laser2_data")
-async def set_laser2_data(laser2_data: laser_enable):
-    if (laser2_data.status):
-        print("Enabling laser2 module")
-        laser_module_2.enabled = True
-    else:
-        print("Disabling laser2 module")
-        laser_module_2.enabled = False
-    print("Laser state:" + str(laser_module_2.enabled))
-    return
-
-@app.post("/set_laser3_data")
-async def set_laser3_data(laser3_data: laser_enable):
-    if (laser3_data.status):
-        print("Enabling laser3 module")
-        laser_module_3.enabled = True
-    else:
-        print("Disabling laser3 module")
-        laser_module_3.enabled = False
-    print("Laser state:" + str(laser_module_3.enabled))
+@app.post("/enable_disable_laser_module/{id}")
+async def enable_disable_laser_module(id : int, state: bool):
+    print(f"Laser module {id} state change to {state}")
+    match id:
+        case 1:
+            laser_module_1.enabled = state
+        case 2:
+            laser_module_2.enabled = state
+        case 3:
+            laser_module_3.enabled = state
+    # TODO send state to the hardware boards
     return
 #------------------------------------------------------------------------------
 # Websocket
 #------------------------------------------------------------------------------
-@app.websocket("/laser1_data")
+@app.websocket("/set_laser_module_data")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
             data = await websocket.receive_text()
-            await websocket.send_text(data)
-            print("Laser 1: " + data)
-            websocket.close()
+            json_data = json.loads(data)
+            json_data["time_stamp"] = time()
+            match json_data["module_number"]:
+                case 1:
+                    laser_module_1 = json_data
+                case 2:
+                    laser_module_2 = json_data
+                case 3:
+                    laser_module_3 = json_data
             # add 
     except WebSocketDisconnect:
-        await websocket.close()
+        return
         
-@app.websocket("/laser2_data")
-async def websocket_laser2_data(websocket: WebSocket):
-    await websocket.accept()
-    try:
-        while True:
-            data = await websocket.receive_text()
-            await websocket.send_text(data)
-            await websocket.send_text(data)
-            print("Laser 2" + data)
-            # add 
-    except WebSocketDisconnect:
-        await websocket.close()
-           
-@app.websocket("/laser3_data")
-async def websocket_laser3_data(websocket: WebSocket):
-    await websocket.accept()
-    try:
-        while True:
-            data = await websocket.receive_text()
-            await websocket.send_text(data)
-            print("Laser 3" + data)
-            # add 
-    except WebSocketDisconnect:
-        await websocket.close()
-        
-@app.websocket("/voa_data")
+@app.websocket("/set_voa_data")
 async def websocket_voa_data(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
             data = await websocket.receive_text()
-            await websocket.send_text(data)
-            print("VOA" + data)
+            json_data = json.loads(data)
+            json_data["time_stamp"] = time()
             # add 
     except WebSocketDisconnect:
-        await websocket.close()
+        return

@@ -1,9 +1,9 @@
 const laser_module_desired_temperature_offset = 5;
 const laser_module_desired_monitor_diode_offset = 250;
-const uri = "http://localhost:8000"
+const HOST = "http://localhost:8000"
 
 
-function post_call(url, json_body, callback) {
+function post_call(path, json_body, callback) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
@@ -11,7 +11,7 @@ function post_call(url, json_body, callback) {
                 callback()
         }
     };
-    xhttp.open("POST", uri + url, true);
+    xhttp.open("POST", HOST + path, true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(JSON.stringify(json_body));
 }
@@ -19,15 +19,13 @@ function post_call(url, json_body, callback) {
 function enable_disable_laser_module(laser_id) {
     let laser_name = "laser_module" + laser_id + "_on_off_switch";
     let state = document.getElementById(laser_name).checked;
-    let url = "/enable_disable_laser_module/" + laser_id + "?" + "state="+ state 
-    post_call(url, null, null);
+    let path = "/enable_disable_laser_module/" + laser_id + "?" + "state="+ state 
+    post_call(path, null, null);
 }
 
-function update_laser_temp(temp, laser_id) {
-    document.getElementById("laser" + laser_id + "_temp").innerHTML = "Temperature: " + temp + "°";
+function update_laser_module_temp(laser_id, laser_type, temp) {
+    document.getElementById("laser_module_" + laser_id + "_" + laser_type + "_temperature").innerHTML = "Hőmérséklet: " + temp + " °C";
 }
-
-
 
 
 function increment_laser_desired_temperature(laser_module_id) {

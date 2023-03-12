@@ -79,6 +79,7 @@ voa_module_set = voa_module_data_set(attenuation=0)
 laser_module_1_websocket = None
 laser_module_2_websocket = None
 laser_module_3_websocket = None
+voa_module_websocket = None
 
 async def websocket_send_data(ws: WebSocket, data: json):
     try:
@@ -188,8 +189,8 @@ async def set_voa_module_attenuation(attenuation: int):
 @app.websocket("/frontend_get_module_data")
 async def websocket_frontend_get_all_module_data(websocket: WebSocket):
     await websocket.accept()
-    global frontend_websocket
-    frontend_websocket = websocket
+    global frontend_get_websocket
+    frontend_get_websocket = websocket
     try:
         while True:
             _ = await websocket.receive_text()
@@ -198,7 +199,7 @@ async def websocket_frontend_get_all_module_data(websocket: WebSocket):
         return
 
     finally:
-        frontend_websocket = None
+        frontend_get_websocket = None
 
 # Websocket for esp32
 
@@ -212,13 +213,13 @@ async def websocket_laser1_data(websocket: WebSocket):
             match json_data["module_number"]:
                 case 1:
                     laser_module_1_report = json_data
-                    websocket_send_data(frontend_websocket, laser_module_1_report.json())
+                    await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_1_report))
                 case 2:
                     laser_module_2_report = json_data
-                    websocket_send_data(frontend_websocket, laser_module_2_report.json())
+                    await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_2_report))
                 case 3:
                     laser_module_3_report = json_data
-                    websocket_send_data(frontend_websocket, laser_module_3_report.json())
+                    await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_3_report))
     except WebSocketDisconnect:
         return
 

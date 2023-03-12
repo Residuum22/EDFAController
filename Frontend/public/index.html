@@ -28,6 +28,87 @@
 <body>
   <div class="container">
     <div class="row mt-3">
+      {% for laser_module_id in laser_modules %}
+      <div class="col mt-3">
+        <div class="card" style="width: 32rem;">
+          <div class="card-body">
+            <h5 class="card-title text-center">Lézer modul {{laser_module_id}}</h5>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch"
+                id="laser_module_{{laser_module_id}}_on_off_switch"
+                onclick="enable_disable_laser_module({{laser_module_id}})">
+              <label class="form-check-label" for="laser_module_{{laser_module_id}}_on_off_switch">Modul
+                engedélyezése/tiltása</label>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-8">
+                <p class="card-text" id="laser_module_{{laser_module_id}}_desired_temperature">Lézerek kívánt
+                  hőmérséklete: 50 °C</p>
+              </div>
+              <div class="col text-right">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-secondary"
+                    onclick="increment_laser_desired_temperature({{laser_module_id}})">+</button>
+                  <button type="button" class="btn btn-secondary"
+                    onclick="decrement_laser_desired_temperature({{laser_module_id}})">-</button>
+                </div>
+              </div>
+            </div>
+
+            <h5>976 nm lézer</h5>
+            <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_current">Monitor dióda árama: 0
+              µA</p>
+            <div class="row">
+              <div class="col-sm-8">
+                <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_desired_current">
+                  Kívánt monitor dióda árama: 0 µA
+                </p>
+              </div>
+              <div class="col">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-secondary"
+                    onclick="increment_monitor_diode_desired_current({{laser_module_id}}, 976)">+</button>
+                  <button type="button" class="btn btn-secondary"
+                    onclick="decrement_monitor_diode_desired_current({{laser_module_id}}, 976)">-</button>
+                </div>
+              </div>
+            </div>
+            <p class="card-text" id="laser_module_{{laser_module_id}}_976_temperature">Hőmérséklet: 0°C</p>
+            <p class="card-text" id="laser_module_{{laser_module_id}}_976_laser_current">Lézer dióda becsült árama: 0 mA
+            </p>
+
+            <h5>1480nm lézer</h5>
+            <p class="card-text" id="laser_module_{{laser_module_id}}_1480_monitor_diode_current">Monitor dióda árama: 0
+              µA</p>
+            <div class="row">
+              <div class="col-sm-8">
+                <p class="card-text" id="laser_module_{{laser_module_id}}_1480_monitor_diode_desired_current">
+                  Kívánt monitor dióda árama: 0 µA
+                </p>
+              </div>
+              <div class="col">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-secondary"
+                    onclick="increment_monitor_diode_desired_current({{laser_module_id}}, 1480)">+</button>
+                  <button type="button" class="btn btn-secondary"
+                    onclick="decrement_monitor_diode_desired_current({{laser_module_id}}, 1480)">-</button>
+                </div>
+              </div>
+            </div>
+            <p class="card-text" id="laser_module_{{laser_module_id}}_1480_temperature">Hőmérséklet: 0°C</p>
+            <p class="card-text" id="laser_module_{{laser_module_id}}_1480_laser_current">Lézer dióda becsült árama: 0
+              mA</p>
+
+            <div class="text-center mt-3">
+              <button type="button" class="btn btn-danger">Vészleállítás</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+
       <div class="col mt-3">
         <div class="card text-right" style="width: 32rem;">
           <div class="card-body">
@@ -46,157 +127,13 @@
               </div>
             </div>
             <div class="text-center mt-3">
-              <button type="button" class="btn btn-primary" onclick="reset_voa_attenuation()">Alaphelyzetbe állítás</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col mt-3">
-        <div class="card" style="width: 32rem;">
-          <div class="card-body">
-            <h5 class="card-title text-center">Lézer modul 1</h5>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="laser_module1_on_off_switch"
-                onclick="enable_disable_laser_module(1)">
-              <label class="form-check-label" for="laser_module_1_on_off_switch">Modul engedélyezése/tiltása</label>
-            </div>
-            <p class="card-text" id="laser1_temp">
-              Temperature: 0°
-            </p>
-            <div class="row">
-              <div class="col-sm-8">
-                <p class="card-text" id="laser1_max_temp">
-                  Maximum tempearature: 0°
-                </p>
-              </div>
-              <div class="col text-right">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary" onclick="increment_laser_max_temp(1)">+</button>
-                  <button type="button" class="btn btn-secondary" onclick="decrement_laser_max_temp(1)">-</button>
-                </div>
-              </div>
-            </div>
-
-            <p class="card-text" id="laser1_monitor_diode">
-              Monitor diode: 0
-            </p>
-            <div class="row">
-              <div class="col-sm-8">
-                <p class="card-text" id="laser1_current">
-                  Laser diode current: ~0 mA
-                </p>
-              </div>
-              <div class="col">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary" onclick="increment_laser_current(1)">+</button>
-                  <button type="button" class="btn btn-secondary" onclick="decrement_laser_current(1)">-</button>
-                </div>
-              </div>
-            </div>
-            <div class="text-center mt-3">
-              <button type="button" class="btn btn-danger">Emergency stop</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col mt-3">
-        <div class="card" style="width: 32rem;">
-          <div class="card-body">
-            <h5 class="card-title text-center">Laser modul 2</h5>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="laser_module2_on_off_switch"
-                onclick="enable_disable_laser_module(2)">
-              <label class="form-check-label" for="laser_module_2_on_off_switch">Enable/Disable module</label>
-            </div>
-            <p class="card-text" id="laser2_temp">
-              Temperature: 0°
-            </p>
-            <div class="row">
-              <div class="col-sm-8">
-                <p class="card-text" id="laser2_max_temp">
-                  Maximum tempearature: 0°
-                </p>
-              </div>
-              <div class="col text-right">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary" onclick="increment_laser_max_temp(2)">+</button>
-                  <button type="button" class="btn btn-secondary" onclick="decrement_laser_max_temp(2)">-</button>
-                </div>
-              </div>
-            </div>
-
-            <p class="card-text" id="laser2_monitor_diode">
-              Monitor diode: 0
-            </p>
-            <div class="row">
-              <div class="col-sm-8">
-                <p class="card-text" id="laser2_current">
-                  Laser diode current: ~0 mA
-                </p>
-              </div>
-              <div class="col">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary" onclick="increment_laser_current(2)">+</button>
-                  <button type="button" class="btn btn-secondary" onclick="decrement_laser_current(2)">-</button>
-                </div>
-              </div>
-            </div>
-            <div class="text-center mt-3">
-              <button type="button" class="btn btn-danger">Emergency stop</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col mt-3">
-        <div class="card" style="width: 32rem;">
-          <div class="card-body">
-            <h5 class="card-title text-center">Laser modul 3</h5>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="laser_module3_on_off_switch"
-                onclick="enable_disable_laser_module(3)">
-              <label class="form-check-label" for="laser_module_3_on_off_switch">Enable/Disable module</label>
-            </div>
-            <p class="card-text" id="laser3_temp">
-              Temperature: 0°
-            </p>
-            <div class="row">
-              <div class="col-sm-8">
-                <p class="card-text" id="laser3_max_temp">
-                  Maximum tempearature: 0°
-                </p>
-              </div>
-              <div class="col text-right">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary" onclick="increment_laser_max_temp(3)">+</button>
-                  <button type="button" class="btn btn-secondary" onclick="decrement_laser_max_temp(3)">-</button>
-                </div>
-              </div>
-            </div>
-
-            <p class="card-text" id="laser3_monitor_diode">
-              Monitor diode: 0
-            </p>
-            <div class="row">
-              <div class="col-sm-8">
-                <p class="card-text" id="laser3_current">
-                  Laser diode current: ~0 mA
-                </p>
-              </div>
-              <div class="col">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary" onclick="increment_laser_current(3)">+</button>
-                  <button type="button" class="btn btn-secondary" onclick="decrement_laser_current(3)">-</button>
-                </div>
-              </div>
-            </div>
-            <div class="text-center mt-3">
-              <button type="button" class="btn btn-danger">Emergency stop</button>
+              <button type="button" class="btn btn-primary" onclick="reset_voa_attenuation()">Alaphelyzetbe
+                állítás</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
   <script src="/npm/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
   <script src="/static/voa_events.js"></script>

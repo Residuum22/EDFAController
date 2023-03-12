@@ -76,6 +76,9 @@ laser_module_3_set = laser_module_data_set(enabled=False, report_interval=1, las
 
 voa_module_set = voa_module_data_set(attenuation=0)
 
+laser_module_1_websocket = None
+laser_module_2_websocket = None
+laser_module_3_websocket = None
 
 async def websocket_send_data(ws: WebSocket, data: json):
     try:
@@ -115,7 +118,8 @@ async def shutdown():
 
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    laser_modules = {1,2,3}
+    return templates.TemplateResponse("index.html", {"request": request, "laser_modules": laser_modules})
 
 
 @app.get("/get_laser_module_data/{id}")
@@ -145,7 +149,6 @@ async def enable_disable_laser_module(id: int, state: bool):
             laser_module_3_set.enabled = state
             await websocket_send_data(laser_module_3_websocket,
                                 laser_module_3_set.json())
-    return
 
 
 @app.post("/set_laser_module_desired_temperature/{id}")
@@ -168,6 +171,11 @@ async def set_laser_module_desired_temperature(id: int, desired_temperature: int
             laser_module_3_set.laser_1480.desired_temperature = desired_temperature
             await websocket_send_data(laser_module_3_websocket,
                                 laser_module_3_set.json())
+            
+@app.post("/set_voa_module_attenuation")
+async def set_voa_module_attenuation(attenuation: int):
+    voa_module_set.attenuation = attenuation
+    await websocket_send_data(voa_module_websocket, voa_module_set.json())
 # ------------------------------------------------------------------------------
 # HTTP End
 # ------------------------------------------------------------------------------
@@ -218,7 +226,6 @@ async def websocket_laser1_data(websocket: WebSocket):
 @app.websocket("/set_laser_module_1")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
-    global laser_module_1_websocket
     laser_module_1_websocket = websocket
     try:
         while True:
@@ -234,7 +241,6 @@ async def websocket_laser1_data(websocket: WebSocket):
 @app.websocket("/set_laser_module_2")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
-    global laser_module_2_websocket
     laser_module_2_websocket = websocket
     try:
         while True:
@@ -250,7 +256,6 @@ async def websocket_laser1_data(websocket: WebSocket):
 @app.websocket("/set_laser_module_3")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
-    global laser_module_3_websocket
     laser_module_3_websocket = websocket
     try:
         while True:
@@ -266,7 +271,6 @@ async def websocket_laser1_data(websocket: WebSocket):
 @app.websocket("/set_voa_module")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
-    global voa_module_websocket
     voa_module_websocket = websocket
     try:
         while True:

@@ -1,4 +1,5 @@
-const laser_max_temp_offset = 20;
+const laser_module_desired_temperature_offset = 5;
+const laser_module_desired_monitor_diode_offset = 250;
 const uri = "http://localhost:8000"
 
 
@@ -26,52 +27,53 @@ function update_laser_temp(temp, laser_id) {
     document.getElementById("laser" + laser_id + "_temp").innerHTML = "Temperature: " + temp + "°";
 }
 
-function increment_laser_max_temp(laser_id) {
-    let laser_name = "laser" + laser_id + "_max_temp";
-    let current_max_temp = document.getElementById(laser_name).innerHTML;
-    let current_pos_int = parseInt(current_max_temp.match(/\d/g).join(""));
 
-    if (current_pos_int < 80) {
-        current_pos_int = current_pos_int + laser_max_temp_offset;
+
+
+function increment_laser_desired_temperature(laser_module_id) {
+    let laser_name = "laser_module_" + laser_module_id + "_desired_temperature";
+    let current_desired_temperature = document.getElementById(laser_name).innerHTML;
+    let current_desired_temperature_int = parseInt(current_desired_temperature.match(/\d/g).join(""));
+
+    if (current_desired_temperature_int < 70) {
+        current_desired_temperature_int = current_desired_temperature_int + laser_module_desired_temperature_offset;
     }
-
-    document.getElementById(laser_name).innerHTML = "Maximum tempearature: " + current_pos_int + "°";
+    document.getElementById(laser_name).innerHTML = "Lézerek kívánt hőmérséklete: " + current_desired_temperature_int + " °C";
 }
 
-function decrement_laser_max_temp(laser_id) {
-    let laser_name = "laser" + laser_id + "_max_temp";
-    let current_max_temp = document.getElementById("laser1_max_temp").innerHTML;
-    let current_pos_int = parseInt(current_max_temp.match(/\d/g).join(""));
+function decrement_laser_desired_temperature(laser_module_id) {
+    let laser_name = "laser_module_" + laser_module_id + "_desired_temperature";
+    let current_desired_temperature = document.getElementById(laser_name).innerHTML;
+    let current_desired_temperature_int = parseInt(current_desired_temperature.match(/\d/g).join(""));
 
-    if (current_pos_int > 0) {
-        current_pos_int = current_pos_int - laser_max_temp_offset;
+    if (current_desired_temperature_int > 40) {
+        current_desired_temperature_int = current_desired_temperature_int - laser_module_desired_temperature_offset;
     }
-
-    document.getElementById("laser1_max_temp").innerHTML = "Maximum tempearature: " + current_pos_int + "°";
+    document.getElementById(laser_name).innerHTML = "Lézerek kívánt hőmérséklete: " + current_desired_temperature_int + " °C";
 }
 
-function increment_laser_current(laser_id) {
-    let laser_name = "laser" + laser_id + "_current";
-    let current_max_temp = document.getElementById(laser_name).innerHTML;
-    let current_pos_int = parseInt(current_max_temp.match(/\d/g).join(""));
+function increment_monitor_diode_desired_current(laser_id, laser_type) {
+    let laser_name = "laser_module_" + laser_id + "_" + laser_type + "_monitor_diode_desired_current";
+    let current_desired_monitor_diode_current = document.getElementById(laser_name).innerHTML;
+    let current_desired_monitor_diode_current_int = parseInt(current_desired_monitor_diode_current.match(/\d/g).join(""));
 
-    if (current_pos_int < 1000) {
-        current_pos_int = current_pos_int + laser_max_temp_offset;
+    if (current_desired_monitor_diode_current_int < 3000) {
+        current_desired_monitor_diode_current_int = current_desired_monitor_diode_current_int + laser_module_desired_monitor_diode_offset;
     }
 
-    document.getElementById(laser_name).innerHTML = "Laser diode current: ~" + current_pos_int + "mA";
+    document.getElementById(laser_name).innerHTML = "Kívánt monitor dióda árama: " + current_desired_monitor_diode_current_int + " µA";
 }
 
-function decrement_laser_current(laser_id) {
-    let laser_name = "laser" + laser_id + "_current";
-    let current_max_temp = document.getElementById(laser_name).innerHTML;
-    let current_pos_int = parseInt(current_max_temp.match(/\d/g).join(""));
+function decrement_monitor_diode_desired_current(laser_id, laser_type) {
+    let laser_name = "laser_module_" + laser_id + "_" + laser_type + "_monitor_diode_desired_current";
+    let current_desired_monitor_diode_current = document.getElementById(laser_name).innerHTML;
+    let current_desired_monitor_diode_current_int = parseInt(current_desired_monitor_diode_current.match(/\d/g).join(""));
 
-    if (current_pos_int > 0) {
-        current_pos_int = current_pos_int - laser_max_temp_offset;
+    if (current_desired_monitor_diode_current_int > 0) {
+        current_desired_monitor_diode_current_int = current_desired_monitor_diode_current_int + laser_module_desired_monitor_diode_offset;
     }
 
-    document.getElementById(laser_name).innerHTML = "Laser diode current: ~" + current_pos_int + "mA";
+    document.getElementById(laser_name).innerHTML = "Kívánt monitor dióda árama: " + current_desired_monitor_diode_current_int + " µA";
 }
 
 function laser_emergency_stop() {

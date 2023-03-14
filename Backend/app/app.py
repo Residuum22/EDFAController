@@ -84,6 +84,7 @@ voa_module_websocket = None
 async def websocket_send_data(ws: WebSocket, data: json):
     try:
         if ws is not None:
+            print(f"Sending data to: {ws} with data {data}")
             await asyncio.wait_for(ws.send_json(data), timeout=1.0)
     except Exception:
         return
@@ -227,6 +228,7 @@ async def websocket_laser1_data(websocket: WebSocket):
 @app.websocket("/set_laser_module_1")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
+    global laser_module_1_websocket
     laser_module_1_websocket = websocket
     try:
         while True:
@@ -242,6 +244,7 @@ async def websocket_laser1_data(websocket: WebSocket):
 @app.websocket("/set_laser_module_2")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
+    global laser_module_2_websocket
     laser_module_2_websocket = websocket
     try:
         while True:
@@ -257,6 +260,7 @@ async def websocket_laser1_data(websocket: WebSocket):
 @app.websocket("/set_laser_module_3")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
+    global laser_module_3_websocket
     laser_module_3_websocket = websocket
     try:
         while True:
@@ -272,6 +276,7 @@ async def websocket_laser1_data(websocket: WebSocket):
 @app.websocket("/set_voa_module")
 async def websocket_laser1_data(websocket: WebSocket):
     await websocket.accept()
+    global voa_module_websocket
     voa_module_websocket = websocket
     try:
         while True:

@@ -44,3 +44,4 @@ settings.json
 *.log
 Firmware/voa_board_firmware/.pio/build
 Firmware/voa_board_firmware/.vscode
+Hardware/laser_module_kicad_prj/#auto_saved_files#

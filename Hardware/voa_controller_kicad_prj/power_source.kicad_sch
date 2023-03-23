@@ -5,10 +5,10 @@
   (paper "A4")
 
   (title_block
-    (title "Power Supply of the VOA board")
-    (date "2022-10-04")
+    (title "Voltage Controlled Amplifier (VOA) controller board")
+    (date "2023-03-25")
     (rev "2.0")
-    (company "Designed by Márk Mihalik")
+    (company "Degined by Márk Mihalik")
   )
 
   (lib_symbols

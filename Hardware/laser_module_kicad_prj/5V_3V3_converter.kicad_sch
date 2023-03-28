@@ -281,19 +281,19 @@
       )
       (symbol "PCD0504_0_1"
         (arc (start 7.62 0) (mid 6.35 1.2202) (end 5.08 0)
-          (stroke (width 0.1524) (type default))
+          (stroke (width 0.1524) (type solid))
           (fill (type none))
         )
         (arc (start 10.16 0) (mid 8.89 1.2202) (end 7.62 0)
-          (stroke (width 0.1524) (type default))
+          (stroke (width 0.1524) (type solid))
           (fill (type none))
         )
         (arc (start 12.7 0) (mid 11.43 1.2202) (end 10.16 0)
-          (stroke (width 0.1524) (type default))
+          (stroke (width 0.1524) (type solid))
           (fill (type none))
         )
         (arc (start 15.24 0) (mid 13.97 1.2202) (end 12.7 0)
-          (stroke (width 0.1524) (type default))
+          (stroke (width 0.1524) (type solid))
           (fill (type none))
         )
       )
@@ -311,7 +311,7 @@
       (property "Datasheet" "" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
-      (property "ki_keywords" "power-flag" (at 0 0 0)
+      (property "ki_keywords" "global power" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
       (property "ki_description" "Power symbol creates a global label with name \"GND\" , ground" (at 0 0 0)
@@ -515,7 +515,7 @@
   (symbol (lib_id "power:GND") (at 175.26 106.68 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 570aaf79-ccc4-4670-920f-9332c576c899)
-    (property "Reference" "#PWR024" (at 175.26 113.03 0)
+    (property "Reference" "#PWR0116" (at 175.26 113.03 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 177.165 107.9499 0)
@@ -531,10 +531,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR024") (unit 1)
+          (reference "#PWR0116") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR082") (unit 1)
+          (reference "#PWR0159") (unit 1)
         )
       )
     )
@@ -543,7 +543,7 @@
   (symbol (lib_id "power:GND") (at 111.125 92.075 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 59b1232e-9690-4ab3-b2f5-480c8cd7df65)
-    (property "Reference" "#PWR023" (at 104.775 92.075 0)
+    (property "Reference" "#PWR0119" (at 104.775 92.075 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 107.95 92.0749 90)
@@ -559,10 +559,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR023") (unit 1)
+          (reference "#PWR0119") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR081") (unit 1)
+          (reference "#PWR0162") (unit 1)
         )
       )
     )
@@ -667,7 +667,7 @@
   (symbol (lib_id "power:GND") (at 94.615 94.615 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 84878a26-3e83-410f-a30f-c962ea1f357b)
-    (property "Reference" "#PWR022" (at 94.615 100.965 0)
+    (property "Reference" "#PWR0118" (at 94.615 100.965 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 96.52 95.8849 0)
@@ -683,10 +683,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR022") (unit 1)
+          (reference "#PWR0118") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR080") (unit 1)
+          (reference "#PWR0161") (unit 1)
         )
       )
     )
@@ -727,7 +727,7 @@
   (symbol (lib_id "power:GND") (at 197.485 97.155 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 9e00e834-641d-4946-abf0-62526f27f21b)
-    (property "Reference" "#PWR026" (at 197.485 103.505 0)
+    (property "Reference" "#PWR0115" (at 197.485 103.505 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 199.39 98.4249 0)
@@ -743,10 +743,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR026") (unit 1)
+          (reference "#PWR0115") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR084") (unit 1)
+          (reference "#PWR0158") (unit 1)
         )
       )
     )
@@ -755,7 +755,7 @@
   (symbol (lib_id "power:GND") (at 187.325 97.155 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 9f5b6deb-b00e-4416-8591-b9b6cda7f6e7)
-    (property "Reference" "#PWR025" (at 187.325 103.505 0)
+    (property "Reference" "#PWR0117" (at 187.325 103.505 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 189.23 98.4249 0)
@@ -771,10 +771,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR025") (unit 1)
+          (reference "#PWR0117") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR083") (unit 1)
+          (reference "#PWR0160") (unit 1)
         )
       )
     )
@@ -783,13 +783,13 @@
   (symbol (lib_id "PCD0504:PCD0504") (at 151.765 89.535 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid b3e4f649-597e-4d9a-badb-814745eb410f)
-    (property "Reference" "L1" (at 161.925 82.55 0)
+    (property "Reference" "L1" (at 161.925 83.82 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "PCD0504" (at 161.925 85.09 0)
+    (property "Value" "PCD0504" (at 161.925 86.36 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "PCD0504VIKINGINDUCTOR:PCD0504" (at 168.275 88.265 0)
+    (property "Footprint" "PCD0504" (at 168.275 88.265 0)
       (effects (font (size 1.27 1.27)) (justify left) hide)
     )
     (property "Datasheet" "https://www.viking.com.tw/Templates/att/PCD_Series.pdf?lng=enVaw1ztYE9ji8ugPiOlDzHd60k" (at 168.275 90.805 0)

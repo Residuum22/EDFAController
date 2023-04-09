@@ -36,12 +36,15 @@ sym-lib-table
 # Pycache
 *.pyc
 
-# VSCode .vscode
-extensions.json
+# VSCode
 settings.json
 
 # Log files
 *.log
 Firmware/voa_board_firmware/.pio/build
-Firmware/voa_board_firmware/.vscode
 Hardware/laser_module_kicad_prj/#auto_saved_files#
+Firmware/voa_board_firmware/build
+Firmware/voa_board_firmware/sdkconfig.old
+Firmware/voa_board_firmware/managed_components
+Firmware/voa_board_firmware/components/led_indicator/test
+Firmware/voa_board_firmware/dependencies.lock

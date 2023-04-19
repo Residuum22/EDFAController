@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP PCD0504
+D SMD Power Inductor
+K
+F https://www.viking.com.tw/Templates/att/PCD_Series.pdf?lng=enVaw1ztYE9ji8ugPiOlDzHd60k
+$ENDCMP
+#
+#End Doc Library

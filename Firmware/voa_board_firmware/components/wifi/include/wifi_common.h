@@ -30,7 +30,7 @@ esp_err_t wifi_connect(void);
 /**
  * Counterpart to wifi_connect, de-initializes Wi-Fi or Ethernet
  */
-esp_err_t example_disconnect(void);
+esp_err_t wifi_disconnect(void);
 
 /**
  * @brief Returns esp-netif pointer created by wifi_connect() described by

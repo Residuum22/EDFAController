@@ -14,6 +14,12 @@ Settings.json
         "config/custom_board.cfg"
     ]
 ```
+Example
+```json
+"idf.espIdfPathWin": "C:\\Users\\mihal\\esp\\esp-idf",
+    "idf.toolsPathWin": "C:\\Espressif\\tools",
+    "idf.pythonBinPathWin": "c:\\Espressif\\python_env\\idf5.0_py3.8_env\\Scripts\\python",
+```
 
 ## Setting up development
 

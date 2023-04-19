@@ -69,7 +69,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         // ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_DISCONNECTED:
-        led_indicator_start(led_state_handle, BLINK_PROVISIONING);
+        led_indicator_start(led_state_handle, BLINK_CONNECTING);
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
         break;
 

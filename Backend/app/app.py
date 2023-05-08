@@ -123,6 +123,10 @@ async def root(request: Request):
     laser_modules = {1,2,3}
     return templates.TemplateResponse("index.html", {"request": request, "laser_modules": laser_modules})
 
+@app.get("/edfa")
+async def root(request: Request):
+    laser_modules = {1,2,3}
+    return templates.TemplateResponse("edfa.html", {"request": request, "laser_modules": laser_modules})
 
 @app.get("/get_laser_module_data/{id}")
 async def get_laser_module_data(id: int):

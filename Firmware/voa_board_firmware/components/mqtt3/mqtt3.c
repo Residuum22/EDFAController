@@ -63,7 +63,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         led_indicator_start(led_state_handle, BLINK_CONNECTED);
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
         // send data to topic
-        msg_id = esp_mqtt_client_subscribe(client, "/topic/voa_setting", 2);
+        msg_id = esp_mqtt_client_subscribe(client, "/voa_attenuation", 2);
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
         // msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
         // ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);

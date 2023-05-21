@@ -23,14 +23,14 @@ class laser_module_data_report(BaseModel):
 class laser_module_data_report_module_976(BaseModel):
     module_number: int
     time_stamp: float
-    laser_976: laser_module_data_report
-    laser_976: laser_module_data_report
+    laser_976_1: laser_module_data_report
+    laser_976_2: laser_module_data_report
     
 class laser_module_data_report_module_1480(BaseModel):
     module_number: int
     time_stamp: float
-    laser_1480: laser_module_data_report
-    laser_1480: laser_module_data_report
+    laser_1480_1: laser_module_data_report
+    laser_1480_2: laser_module_data_report
     
 # Laser module data set
 class laser_module_data_set(BaseModel):
@@ -39,16 +39,16 @@ class laser_module_data_set(BaseModel):
     desired_monitor_diode_current: int
 
 class laser_module_data_set_module_976(BaseModel):
-    module_number: int
-    time_stamp: float
-    laser_976: laser_module_data_set
-    laser_976: laser_module_data_set
+    enabled: bool
+    report_interval: int
+    laser_976_1: laser_module_data_set
+    laser_976_2: laser_module_data_set
     
 class laser_module_data_set_module_1480(BaseModel):
-    module_number: int
-    time_stamp: float
-    laser_1480: laser_module_data_set
-    laser_1480: laser_module_data_set
+    enabled: bool
+    report_interval: int
+    laser_1480_1: laser_module_data_set
+    laser_1480_2: laser_module_data_set
     
 # VOA module data report
 class voa_module_data_set(BaseModel):
@@ -60,36 +60,39 @@ class voa_module_data_set(BaseModel):
 # ------------------------------------------------------------------------------
 laser_module_1_report = laser_module_data_report_module_976(
                         module_number=1, time_stamp=0,
-                        laser_976={"laser_id": "LD1","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
-                        laser_976={"laser_id": "LD6","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
+                        laser_976_1={"laser_id": "LD1","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
+                        laser_976_2={"laser_id": "LD6","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
                         )
 
 laser_module_2_report = laser_module_data_report_module_1480(
                         module_number=2, time_stamp=0,
-                        laser_1480={"laser_id": "LD2","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
-                        laser_1480={"laser_id": "LD4","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
+                        laser_1480_1={"laser_id": "LD2","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
+                        laser_1480_2={"laser_id": "LD4","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
                         )
 
 laser_module_3_report = laser_module_data_report_module_1480(
                         module_number=3, time_stamp=0,
-                        laser_1480={"laser_id": "LD3","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
-                        laser_1480={"laser_id": "LD4","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
+                        laser_1480_1={"laser_id": "LD3","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
+                        laser_1480_2={"laser_id": "LD4","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
                         )
 
-laser_module_1_set = laser_module_data_set(
+laser_module_1_set = laser_module_data_set_module_976(
                         enabled=False, report_interval=1, 
-                        laser_976={"laser_id": "LD1","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
-                        laser_976={"laser_id": "LD6","desired_temperature": 50, "desired_monitor_diode_current": 0})
+                        laser_976_1={"laser_id": "LD1","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
+                        laser_976_2={"laser_id": "LD6","desired_temperature": 50, "desired_monitor_diode_current": 0}
+                        )
 
-laser_module_2_set = laser_module_data_set(
+laser_module_2_set = laser_module_data_set_module_1480(
                         enabled=False, report_interval=1, 
-                        laser_1480={"laser_id": "LD2","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
-                        laser_1480={"laser_id": "LD4","desired_temperature": 50, "desired_monitor_diode_current": 0})
+                        laser_1480_1={"laser_id": "LD2","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
+                        laser_1480_2={"laser_id": "LD4","desired_temperature": 50, "desired_monitor_diode_current": 0}
+                        )
 
-laser_module_3_set = laser_module_data_set(
+laser_module_3_set = laser_module_data_set_module_1480(
                         enabled=False, report_interval=1, 
-                        laser_1480={"laser_id": "LD3","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
-                        laser_1480={"laser_id": "LD6","desired_temperature": 50, "desired_monitor_diode_current": 0})
+                        laser_1480_1={"laser_id": "LD3","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
+                        laser_1480_2={"laser_id": "LD6","desired_temperature": 50, "desired_monitor_diode_current": 0}
+                        )
 
 voa_module_set = voa_module_data_set(attenuation=0)
 

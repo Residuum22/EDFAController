@@ -35,17 +35,16 @@ class laser_module_data_report_module_1480(BaseModel):
 # Laser module data set
 class laser_module_data_set(BaseModel):
     laser_id: str
+    enabled: bool
     desired_temperature: int
     desired_monitor_diode_current: int
 
 class laser_module_data_set_module_976(BaseModel):
-    enabled: bool
     report_interval: int
     laser_976_1: laser_module_data_set
     laser_976_2: laser_module_data_set
     
 class laser_module_data_set_module_1480(BaseModel):
-    enabled: bool
     report_interval: int
     laser_1480_1: laser_module_data_set
     laser_1480_2: laser_module_data_set
@@ -194,10 +193,12 @@ async def set_laser_module_desired_temperature(id: int, desired_temperature: int
             mqtt.publish('/laser_module/3/set_temp', json.dumps(laser_module_3_set))
       
             
-@app.post("/set_voa_module_attenuation")
+@app.post("/set_voa_module_attenuation/{attenuation}")
 async def set_voa_module_attenuation(attenuation: int):
+    print(f'Attenuation set to attenuation to: {attenuation}')
     voa_module_set.attenuation = attenuation
-    mqtt.publish("/voa_attenuation", json.dumps(voa_module_set))
+    # TODO: Figure it out why attenuation with json dups why not working.
+    mqtt.publish("/voa_attenuation", json.dumps({"attenuation": attenuation}))
 # ------------------------------------------------------------------------------
 # HTTP End
 # ------------------------------------------------------------------------------

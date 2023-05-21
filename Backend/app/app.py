@@ -150,16 +150,6 @@ async def root(request: Request):
 async def root(request: Request):
     return templates.TemplateResponse("edfa.html", {"request": request})
 
-@app.get("/get_laser_module_data/{id}")
-async def get_laser_module_data(id: int):
-    match id:
-        case 1:
-            return laser_module_1_report
-        case 2:
-            return laser_module_2_report
-        case 3:
-            return laser_module_3_report
-
 
 @app.post('/enable_disable_laser_id/{id}')
 async def enable_disable_laser_id(id: str, state: bool):
@@ -307,19 +297,22 @@ async def message(client, topic, payload, qos, properties):
 
 @mqtt.subscribe("/report_laser_module_data")
 async def message_to_topic(client, topic, payload, qos, properties):
-    print("Received message to specific topic: ", topic, payload.decode(), qos, properties)
-    json_data = payload.decode()
-    json_data["time_stamp"] = time.time()
-    match json_data["module_number"]:
-        case 1:
-            laser_module_1_report = json_data
-            await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_1_report))
-        case 2:
-            laser_module_2_report = json_data
-            await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_2_report))
-        case 3:
-            laser_module_3_report = json_data
-            await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_3_report))
+    #print("Received message to specific topic: ", topic, payload.decode(), qos, properties)
+    json_data = json.loads(payload.decode())
+    json_data["time_stamp"] = time()
+    try:
+        match json_data["module_number"]:
+            case 1:
+                laser_module_1_report = json_data
+                await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_1_report))
+            case 2:
+                laser_module_2_report = json_data
+                await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_2_report))
+            case 3:
+                laser_module_3_report = json_data
+                await websocket_send_data(frontend_get_websocket, json.dumps(laser_module_3_report))
+    except:
+        print('No websocket found.')
 
 @mqtt.on_disconnect()
 def disconnect(client, packet, exc=None):

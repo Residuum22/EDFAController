@@ -11,14 +11,32 @@ Socket.onmessage = function (evt) {
     console.log(typeof(json_msg))
     let module_number = json_msg["module_number"]
 
-    update_laser_module_temp(module_number, 976, json_msg["laser_976"]["temperature"])
-    update_laser_module_temp(module_number, 1480, json_msg["laser_1480"]["temperature"])
+    switch (module_number) {
+        case 1:
+            update_laser_id_temp(json_msg['laser_976_1']['laser_id'], json_msg['laser_976_1']['temperature'])
+            update_laser_id_temp(json_msg['laser_976_2']['laser_id'], json_msg['laser_976_2']['temperature'])
 
-    update_laser_module_laser_current(module_number, 976, json_msg["laser_976"]["laser_current"])
-    update_laser_module_laser_current(module_number, 1480, json_msg["laser_1480"]["laser_current"])
+            update_laser_id_laser_current(json_msg['laser_976_1']['laser_id'], json_msg['laser_976_1']['laser_current'])
+            update_laser_id_laser_current(json_msg['laser_976_2']['laser_id'], json_msg['laser_976_2']['laser_current'])
 
-    update_laser_module_monitor_diode_current(module_number, 976, json_msg["laser_976"]["monitor_diode_current"])
-    update_laser_module_monitor_diode_current(module_number, 1480, json_msg["laser_1480"]["monitor_diode_current"])
+            update_laser_id_monitor_diode_current(json_msg['laser_976_1']['laser_id'], json_msg['laser_976_1']['monitor_diode_current'])
+            update_laser_id_monitor_diode_current(json_msg['laser_976_2']['laser_id'], json_msg['laser_976_2']['monitor_diode_current'])
+            break;
+        
+        case 2:
+        case 3:
+            update_laser_id_temp(json_msg['laser_1480_1']['laser_id'], json_msg['laser_1480_1']['temperature'])
+            update_laser_id_temp(json_msg['laser_1480_2']['laser_id'], json_msg['laser_1480_2']['temperature'])
+
+            update_laser_id_laser_current(json_msg['laser_1480_1']['laser_id'], json_msg['laser_1480_1']['laser_current'])
+            update_laser_id_laser_current(json_msg['laser_1480_2']['laser_id'], json_msg['laser_1480_2']['laser_current'])
+
+            update_laser_id_monitor_diode_current(json_msg['laser_1480_1']['laser_id'], json_msg['laser_1480_1']['monitor_diode_current'])
+            update_laser_id_monitor_diode_current(json_msg['laser_1480_2']['laser_id'], json_msg['laser_1480_2']['monitor_diode_current'])
+            break;
+        default:
+            break;
+    }
 };
 
 Socket.onclose = function (event) {

@@ -102,14 +102,14 @@ function laser_emergency_stop(laser_id) {
     });
 }
 
-function update_laser_module_temp(laser_id, laser_type, temp) {
-    document.getElementById(`laser_module_${laser_id}_${laser_type}_temperature`).innerHTML = `Hőmérséklet: ${temp} °C`;
+function update_laser_id_temp(laser_id, temp) {
+    document.getElementById(`laser_id_${laser_id}_temperature`).innerHTML = `Hőmérséklet: ${temp} °C`;
 }
 
-function update_laser_module_monitor_diode_current(laser_id, laser_type, current) {
-    document.getElementById(`laser_module_${laser_id}_${laser_type}_monitor_diode_current`).innerHTML = `Monitor dióda árama: ${current} µA`;
+function update_laser_id_monitor_diode_current(laser_id, current) {
+    document.getElementById(`laser_id_${laser_id}_monitor_diode_current`).innerHTML = `Monitor dióda árama: ${current} µA`;
 }
 
-function update_laser_module_laser_current(laser_id, laser_type, current) {
-    document.getElementById(`laser_module_${laser_id}_${laser_type}_laser_current`).innerHTML = `Lézer dióda becsült árama: ${current} mA`;
+function update_laser_id_laser_current(laser_id, current) {
+    document.getElementById(`laser_id_${laser_id}_laser_current`).innerHTML = `Lézer dióda becsült árama: ${current} mA`;
 }

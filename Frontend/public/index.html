@@ -71,20 +71,20 @@
                 <label class="form-check-label" for="laser_id_{{laser_id}}_on_off_switch">{{laser_id}}
                   engedélyezése/tiltása</label>
               </div>
-              <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_current">Monitor dióda árama: 0
+              <p class="card-text" id="laser_module_{{laser_id}}_monitor_diode_current">Monitor dióda árama: 0
                 µA</p>
               <div class="row">
                 <div class="col-sm-8">
-                  <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_desired_current">
+                  <p class="card-text" id="laser_module_{{laser_id}}_monitor_diode_desired_current">
                     Kívánt monitor dióda árama: 0 µA
                   </p>
                 </div>
                 <div class="col">
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-secondary"
-                      onclick="increment_monitor_diode_desired_current({{laser_module_id}}, 976)">+</button>
+                      onclick="increment_monitor_diode_desired_current('{{laser_id}}')">+</button>
                     <button type="button" class="btn btn-secondary"
-                      onclick="decrement_monitor_diode_desired_current({{laser_module_id}}, 976)">-</button>
+                      onclick="decrement_monitor_diode_desired_current('{{laser_id}}')">-</button>
                   </div>
                 </div>
               </div>
@@ -94,7 +94,7 @@
               {% endfor %}
             <!-- Module emergency shutdown -->
             <div class="text-center mt-3">
-              <button type="button" class="btn btn-danger">Vészleállítás</button>
+              <button type="button" class="btn btn-danger" onclick="laser_emergency_stop({{laser_module_id['laser_id']}})">Vészleállítás</button>
             </div>
 
             <!-- Module 2 and 3 has 1480 nm -->
@@ -105,25 +105,24 @@
                 <input class="form-check-input" type="checkbox" role="switch"
                   id="laser_id_{{laser_id}}_on_off_switch"
                   onclick="enable_disable_laser_id('{{laser_id}}')">
-                  <!-- TODO change the js to disable the ld only -->
                 <label class="form-check-label" for="laser_id_{{laser_id}}_on_off_switch">{{laser_id}}
                   engedélyezése/tiltása</label>
               </div>
 
-              <p class="card-text" id="laser_module_{{laser_module_id}}_1480_monitor_diode_current">Monitor dióda árama: 0
+              <p class="card-text" id="laser_module_{{laser_id}}_monitor_diode_current">Monitor dióda árama: 0
                 µA</p>
               <div class="row">
                 <div class="col-sm-8">
-                  <p class="card-text" id="laser_module_{{laser_module_id}}_1480_monitor_diode_desired_current">
+                  <p class="card-text" id="laser_module_{{laser_id}}_monitor_diode_desired_current">
                     Kívánt monitor dióda árama: 0 µA
                   </p>
                 </div>
                 <div class="col">
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-secondary"
-                      onclick="increment_monitor_diode_desired_current({{laser_module_id}}, 1480)">+</button>
+                      onclick="increment_monitor_diode_desired_current('{{laser_id}}')">+</button>
                     <button type="button" class="btn btn-secondary"
-                      onclick="decrement_monitor_diode_desired_current({{laser_module_id}}, 1480)">-</button>
+                      onclick="decrement_monitor_diode_desired_current('{{laser_id}}')">-</button>
                   </div>
                 </div>
               </div>
@@ -133,7 +132,7 @@
               {% endfor %}
             <!-- Emergency shut down btn  -->
             <div class="text-center mt-3">
-              <button type="button" class="btn btn-danger">Vészleállítás</button>
+              <button type="button" class="btn btn-danger" onclick="laser_emergency_stop({{laser_module_id['laser_id']}})">Vészleállítás</button>
             </div>
             {% endif %}
           </div>

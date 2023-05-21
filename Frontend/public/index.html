@@ -32,11 +32,15 @@
 <body>
   <div class="container">
     <div class="row mt-3">
-      {% for laser_module_id in laser_modules %}
+      <!-- Instances generation - this will generate module 1,2,3 -->
+      {% for laser_module_id in laser_module_instances %}
+      <!-- Laser modules header is the same at all instances -->
       <div class="col mt-3">
         <div class="card" style="width: 32rem;">
           <div class="card-body">
-            <h5 class="card-title text-center">Lézer modul {{laser_module_id}}</h5>
+
+            <h5 class="card-title text-center">Lézer modul {{laser_module_id['laser_module_id']}}</h5>
+            
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch"
                 id="laser_module_{{laser_module_id}}_on_off_switch"
@@ -46,10 +50,12 @@
             </div>
 
             <div class="row">
+
               <div class="col-sm-8">
                 <p class="card-text" id="laser_module_{{laser_module_id}}_desired_temperature">Lézerek kívánt
                   hőmérséklete: 50 °C</p>
               </div>
+
               <div class="col text-right">
                 <div class="btn-group" role="group">
                   <button type="button" class="btn btn-secondary"
@@ -58,61 +64,93 @@
                     onclick="decrement_laser_desired_temperature({{laser_module_id}})">-</button>
                 </div>
               </div>
-            </div>
 
-            <h5>976 nm lézer</h5>
-            <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_current">Monitor dióda árama: 0
-              µA</p>
-            <div class="row">
-              <div class="col-sm-8">
-                <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_desired_current">
-                  Kívánt monitor dióda árama: 0 µA
-                </p>
+            </div>
+            
+            <!-- Generate the 3 laser module 1 has 980nm and 1480nm -->
+            {% if '1' in laser_module_id['laser_module_id'] %}
+              {% for laser_id in laser_module_id['laser_id'] %}
+
+              <h5>976 nm lézer [{{laser_id}}]</h5>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                  id="laser_module_{{laser_module_id}}_on_off_switch"
+                  onclick="enable_disable_laser_module({{laser_module_id}})">
+                  <!-- TODO change the js to disable the ld only -->
+                <label class="form-check-label" for="laser_module_{{laser_module_id}}_on_off_switch">{{laser_id}}
+                  engedélyezése/tiltása</label>
               </div>
-              <div class="col">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary"
-                    onclick="increment_monitor_diode_desired_current({{laser_module_id}}, 976)">+</button>
-                  <button type="button" class="btn btn-secondary"
-                    onclick="decrement_monitor_diode_desired_current({{laser_module_id}}, 976)">-</button>
+              <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_current">Monitor dióda árama: 0
+                µA</p>
+              <div class="row">
+                <div class="col-sm-8">
+                  <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_desired_current">
+                    Kívánt monitor dióda árama: 0 µA
+                  </p>
+                </div>
+                <div class="col">
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-secondary"
+                      onclick="increment_monitor_diode_desired_current({{laser_module_id}}, 976)">+</button>
+                    <button type="button" class="btn btn-secondary"
+                      onclick="decrement_monitor_diode_desired_current({{laser_module_id}}, 976)">-</button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <p class="card-text" id="laser_module_{{laser_module_id}}_976_temperature">Hőmérséklet: 0 °C</p>
-            <p class="card-text" id="laser_module_{{laser_module_id}}_976_laser_current">Lézer dióda becsült árama: 0 mA
-            </p>
-
-            <h5>1480nm lézer</h5>
-            <p class="card-text" id="laser_module_{{laser_module_id}}_1480_monitor_diode_current">Monitor dióda árama: 0
-              µA</p>
-            <div class="row">
-              <div class="col-sm-8">
-                <p class="card-text" id="laser_module_{{laser_module_id}}_1480_monitor_diode_desired_current">
-                  Kívánt monitor dióda árama: 0 µA
-                </p>
-              </div>
-              <div class="col">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary"
-                    onclick="increment_monitor_diode_desired_current({{laser_module_id}}, 1480)">+</button>
-                  <button type="button" class="btn btn-secondary"
-                    onclick="decrement_monitor_diode_desired_current({{laser_module_id}}, 1480)">-</button>
-                </div>
-              </div>
-            </div>
-            <p class="card-text" id="laser_module_{{laser_module_id}}_1480_temperature">Hőmérséklet: 0°C</p>
-            <p class="card-text" id="laser_module_{{laser_module_id}}_1480_laser_current">Lézer dióda becsült árama: 0
-              mA</p>
-
+              <p class="card-text" id="laser_module_{{laser_module_id}}_976_temperature">Hőmérséklet: 0 °C</p>
+              <p class="card-text" id="laser_module_{{laser_module_id}}_976_laser_current">Lézer dióda becsült árama: 0 mA
+              </p>
+              {% endfor %}
+            <!-- Module emergency shutdown -->
             <div class="text-center mt-3">
               <button type="button" class="btn btn-danger">Vészleállítás</button>
             </div>
+
+            <!-- Module 2 and 3 has 1480 nm -->
+            {% elif '2' or '3' in laser_module_id['laser_module_id'] %}
+              {% for laser_id in laser_module_id['laser_id'] %}
+              <h5>1480nm lézer [{{laser_id}}]</h5>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                  id="laser_module_{{laser_module_id}}_on_off_switch"
+                  onclick="enable_disable_laser_module({{laser_module_id}})">
+                  <!-- TODO change the js to disable the ld only -->
+                <label class="form-check-label" for="laser_module_{{laser_module_id}}_on_off_switch">{{laser_id}}
+                  engedélyezése/tiltása</label>
+              </div>
+
+              <p class="card-text" id="laser_module_{{laser_module_id}}_1480_monitor_diode_current">Monitor dióda árama: 0
+                µA</p>
+              <div class="row">
+                <div class="col-sm-8">
+                  <p class="card-text" id="laser_module_{{laser_module_id}}_1480_monitor_diode_desired_current">
+                    Kívánt monitor dióda árama: 0 µA
+                  </p>
+                </div>
+                <div class="col">
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-secondary"
+                      onclick="increment_monitor_diode_desired_current({{laser_module_id}}, 1480)">+</button>
+                    <button type="button" class="btn btn-secondary"
+                      onclick="decrement_monitor_diode_desired_current({{laser_module_id}}, 1480)">-</button>
+                  </div>
+                </div>
+              </div>
+              <p class="card-text" id="laser_module_{{laser_module_id}}_1480_temperature">Hőmérséklet: 0°C</p>
+              <p class="card-text" id="laser_module_{{laser_module_id}}_1480_laser_current">Lézer dióda becsült árama: 0
+                mA</p>
+              {% endfor %}
+            <!-- Emergency shut down btn  -->
+            <div class="text-center mt-3">
+              <button type="button" class="btn btn-danger">Vészleállítás</button>
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>
       {% endfor %}
 
-
+      <!-- VOA attenuation set -->
       <div class="col mt-3">
         <div class="card text-right" style="width: 32rem;">
           <div class="card-body">

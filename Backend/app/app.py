@@ -67,13 +67,13 @@ laser_module_1_report = laser_module_data_report_module_976(
 laser_module_2_report = laser_module_data_report_module_1480(
                         module_number=2, time_stamp=0,
                         laser_1480_1={"laser_id": "LD2","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
-                        laser_1480_2={"laser_id": "LD4","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
+                        laser_1480_2={"laser_id": "LD3","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
                         )
 
 laser_module_3_report = laser_module_data_report_module_1480(
                         module_number=3, time_stamp=0,
-                        laser_1480_1={"laser_id": "LD3","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
-                        laser_1480_2={"laser_id": "LD4","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
+                        laser_1480_1={"laser_id": "LD4","temperature": 0, "monitor_diode_current": 0, "laser_current": 0},
+                        laser_1480_2={"laser_id": "LD5","temperature": 0, "monitor_diode_current": 0, "laser_current": 0}
                         )
 
 laser_module_1_set = laser_module_data_set_module_976(
@@ -85,13 +85,13 @@ laser_module_1_set = laser_module_data_set_module_976(
 laser_module_2_set = laser_module_data_set_module_1480(
                         enabled=False, report_interval=1, 
                         laser_1480_1={"laser_id": "LD2","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
-                        laser_1480_2={"laser_id": "LD4","desired_temperature": 50, "desired_monitor_diode_current": 0}
+                        laser_1480_2={"laser_id": "LD3","desired_temperature": 50, "desired_monitor_diode_current": 0}
                         )
 
 laser_module_3_set = laser_module_data_set_module_1480(
                         enabled=False, report_interval=1, 
-                        laser_1480_1={"laser_id": "LD3","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
-                        laser_1480_2={"laser_id": "LD6","desired_temperature": 50, "desired_monitor_diode_current": 0}
+                        laser_1480_1={"laser_id": "LD4","desired_temperature": 50, "desired_monitor_diode_current": 0}, 
+                        laser_1480_2={"laser_id": "LD5","desired_temperature": 50, "desired_monitor_diode_current": 0}
                         )
 
 voa_module_set = voa_module_data_set(attenuation=0)
@@ -136,8 +136,12 @@ async def shutdown():
 # ------------------------------------------------------------------------------
 @app.get("/")
 async def root(request: Request):
-    laser_modules = {1,2,3}
-    return templates.TemplateResponse("index.html", {"request": request, "laser_modules": laser_modules})
+    laser_module_instances = [
+        {'laser_module_id': '1', 'laser_id': ['LD1', 'LD6']},
+        {'laser_module_id': '2', 'laser_id': ['LD2', 'LD3']},
+        {'laser_module_id': '3', 'laser_id': ['LD4', 'LD5']}
+        ]
+    return templates.TemplateResponse("index.html", {"request": request, 'laser_module_instances': laser_module_instances})
 
 @app.get("/help")
 async def root(request: Request):

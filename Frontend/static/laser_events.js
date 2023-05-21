@@ -16,10 +16,15 @@ function post_call(path, json_body, callback) {
     xhttp.send(JSON.stringify(json_body));
 }
 
-function enable_disable_laser_module(laser_id) {
-    let laser_name = `laser_module_${laser_id}_on_off_switch`;
-    let state = document.getElementById(laser_name).checked;
-    let path = "/enable_disable_laser_module/" + laser_id + "?" + "state="+ state 
+function send_desTemp_backend(laser_id, desTemp) {
+    let path = "/set_laser_module_desired_temperature/" + laser_id + '?' + 'desired_temperature=' + desTemp;
+    post_call_voa(path, null, null);
+}
+
+function enable_disable_laser_id(laser_id) {
+    let laser_id_name = `laser_id_${laser_id}_on_off_switch`;
+    let state = document.getElementById(laser_id_name).checked;
+    let path = "/enable_disable_laser_id/" + laser_id + "?" + "state="+ state;
     post_call(path, null, null);
 }
 
@@ -30,6 +35,7 @@ function increment_laser_desired_temperature(laser_module_id) {
 
     if (current_desired_temperature_int < 70) {
         current_desired_temperature_int = current_desired_temperature_int + laser_module_desired_temperature_offset;
+        send_desTemp_backend(laser_module_id, current_desired_temperature_int);
     }
     document.getElementById(laser_name).innerHTML = "Lézerek kívánt hőmérséklete: " + current_desired_temperature_int + " °C";
 }
@@ -41,6 +47,7 @@ function decrement_laser_desired_temperature(laser_module_id) {
 
     if (current_desired_temperature_int > 40) {
         current_desired_temperature_int = current_desired_temperature_int - laser_module_desired_temperature_offset;
+        send_desTemp_backend(laser_module_id, current_desired_temperature_int);
     }
     document.getElementById(laser_name).innerHTML = "Lézerek kívánt hőmérséklete: " + current_desired_temperature_int + " °C";
 }

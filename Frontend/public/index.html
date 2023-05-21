@@ -40,28 +40,20 @@
           <div class="card-body">
 
             <h5 class="card-title text-center">Lézer modul {{laser_module_id['laser_module_id']}}</h5>
-            
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch"
-                id="laser_module_{{laser_module_id}}_on_off_switch"
-                onclick="enable_disable_laser_module({{laser_module_id}})">
-              <label class="form-check-label" for="laser_module_{{laser_module_id}}_on_off_switch">Modul
-                engedélyezése/tiltása</label>
-            </div>
 
             <div class="row">
 
               <div class="col-sm-8">
-                <p class="card-text" id="laser_module_{{laser_module_id}}_desired_temperature">Lézerek kívánt
+                <p class="card-text" id="laser_module_{{laser_module_id['laser_module_id']}}_desired_temperature">Lézerek kívánt
                   hőmérséklete: 50 °C</p>
               </div>
 
               <div class="col text-right">
                 <div class="btn-group" role="group">
                   <button type="button" class="btn btn-secondary"
-                    onclick="increment_laser_desired_temperature({{laser_module_id}})">+</button>
+                    onclick="increment_laser_desired_temperature({{laser_module_id['laser_module_id']}})">+</button>
                   <button type="button" class="btn btn-secondary"
-                    onclick="decrement_laser_desired_temperature({{laser_module_id}})">-</button>
+                    onclick="decrement_laser_desired_temperature({{laser_module_id['laser_module_id']}})">-</button>
                 </div>
               </div>
 
@@ -74,10 +66,9 @@
               <h5>976 nm lézer [{{laser_id}}]</h5>
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch"
-                  id="laser_module_{{laser_module_id}}_on_off_switch"
-                  onclick="enable_disable_laser_module({{laser_module_id}})">
-                  <!-- TODO change the js to disable the ld only -->
-                <label class="form-check-label" for="laser_module_{{laser_module_id}}_on_off_switch">{{laser_id}}
+                  id="laser_id_{{laser_id}}_on_off_switch"
+                  onclick="enable_disable_laser_id('{{laser_id}}')">
+                <label class="form-check-label" for="laser_id_{{laser_id}}_on_off_switch">{{laser_id}}
                   engedélyezése/tiltása</label>
               </div>
               <p class="card-text" id="laser_module_{{laser_module_id}}_976_monitor_diode_current">Monitor dióda árama: 0
@@ -112,10 +103,10 @@
               <h5>1480nm lézer [{{laser_id}}]</h5>
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch"
-                  id="laser_module_{{laser_module_id}}_on_off_switch"
-                  onclick="enable_disable_laser_module({{laser_module_id}})">
+                  id="laser_id_{{laser_id}}_on_off_switch"
+                  onclick="enable_disable_laser_id('{{laser_id}}')">
                   <!-- TODO change the js to disable the ld only -->
-                <label class="form-check-label" for="laser_module_{{laser_module_id}}_on_off_switch">{{laser_id}}
+                <label class="form-check-label" for="laser_id_{{laser_id}}_on_off_switch">{{laser_id}}
                   engedélyezése/tiltása</label>
               </div>
 

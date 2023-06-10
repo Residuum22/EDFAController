@@ -7,6 +7,11 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
+#include "esp_adc/adc_oneshot.h"
+#include "esp_adc/adc_cali.h"
+#include "esp_adc/adc_cali_scheme.h"
+#include "driver/gpio.h"
+
 #define TIMER_RESOLUTION_HZ 1000000 // 1MHz, 1us per tick
 #define TIMER_PERIOD 1000           // 1000 ticks, 1ms
 #define COMPARE_VALUE TIMER_PERIOD / 4
@@ -185,5 +190,119 @@ void voa_control_disable_rev()
     for (int i = 0; i < 2; i++)
     {
         ESP_ERROR_CHECK(mcpwm_generator_set_force_level(rev_generators[i], 0, true));
+    }
+}
+
+
+adc_cali_handle_t adc1_cali_handle = NULL;
+bool do_calibration1;
+adc_oneshot_unit_handle_t adc1_handle;
+
+#define POT_VOLTAGE 4095
+#define MAX_VOA_ATTENUATION_IN_V POT_VOLTAGE * 0.98
+#define MIN_VOA_ATTENUATION_IN_V POT_VOLTAGE * 0.4
+
+static uint16_t voa_pot_min_voltage = MAX_VOA_ATTENUATION_IN_V;
+static uint16_t voa_pot_max_voltage = MIN_VOA_ATTENUATION_IN_V;
+
+// https://www.calculator.net/slope-calculator.html
+#define SLOPE 122.85
+#define CONVERT_DB_TO_VOLTAGE(x) (x * SLOPE + MIN_VOA_ATTENUATION_IN_V)
+
+void voa_control_adc_init()
+{
+    //-------------ADC2 Init---------------//
+    adc_oneshot_unit_init_cfg_t init_config1 = {
+        .unit_id = ADC_UNIT_1,
+    };
+    ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
+
+    //-------------ADC2 Calibration Init---------------//
+    do_calibration1 = false;
+
+    //-------------ADC2 Config---------------//
+    adc_oneshot_chan_cfg_t config = {
+        .bitwidth = ADC_BITWIDTH_DEFAULT,
+        .atten = ADC_ATTEN_DB_11,
+    };
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_0, &config));
+}
+
+void voa_control_set_attenuation_zero()
+{
+    int adc_value = 0;
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+
+    while (adc_value > MIN_VOA_ATTENUATION_IN_V)
+    {
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+        ESP_LOGI(TAG, "Set VOA in the default state");
+        ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC_CHANNEL_0, adc_value);
+        voa_control_disable_fwd();
+        voa_control_enable_rev();
+    }
+    voa_control_disable_rev();
+}
+
+
+void voa_control_task(void *pvParameters)
+{
+    uint8_t attenuation = 0;
+
+    voa_control_init_fwd();
+    voa_control_init_rev();
+
+    int adc_value = 0;
+
+    // TODO: Remove this
+    // Configure GPIO4 as input becasse it is connected to the VOA potentiometer by default but it is unable to use
+    gpio_config_t io_conf = {
+        .intr_type = GPIO_INTR_DISABLE,
+        .mode = GPIO_MODE_INPUT,
+        .pin_bit_mask = (1ULL << GPIO_NUM_4),
+        .pull_down_en = 0,
+        .pull_up_en = 0,
+    };
+
+    gpio_config(&io_conf);
+    // End of TODO
+
+    voa_control_set_attenuation_zero();
+
+    int last_adc_value = MIN_VOA_ATTENUATION_IN_V;
+
+    for (;;)
+    {
+        xQueueReceive(voa_attenuation_queue, &attenuation, portMAX_DELAY);
+        ESP_LOGI(TAG, "Attenuation: %d", attenuation);
+        int espected_raw = CONVERT_DB_TO_VOLTAGE(attenuation);
+        if (espected_raw > MAX_VOA_ATTENUATION_IN_V)
+        {
+            espected_raw = MAX_VOA_ATTENUATION_IN_V;
+        }
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+
+        if (last_adc_value < espected_raw)
+        {
+            voa_control_disable_rev();
+            voa_control_enable_fwd();
+            while (adc_value < espected_raw)
+            {
+                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+            }
+        }
+        else
+        {
+            voa_control_disable_fwd();
+            voa_control_enable_rev();
+            while (adc_value > espected_raw)
+            {
+                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+            }
+        }
+
+        last_adc_value = adc_value;
+        voa_control_disable_fwd();
+        voa_control_disable_rev();
     }
 }

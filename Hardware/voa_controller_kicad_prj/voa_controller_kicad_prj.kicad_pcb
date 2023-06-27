@@ -3269,7 +3269,7 @@
   (gr_text "Download" (at 92.4 81.87) (layer "F.SilkS") (tstamp 023e222c-8f56-4876-9417-d71e5af17cfd)
     (effects (font (size 1 1) (thickness 0.2)))
   )
-  (gr_text "voa_controller Rev 2.0" (at 134 104) (layer "F.SilkS") (tstamp 0b70a2cb-cc44-4003-a119-11e90951b2c1)
+  (gr_text "voa_controller Rev 3.0" (at 134 104) (layer "F.SilkS") (tstamp 0b70a2cb-cc44-4003-a119-11e90951b2c1)
     (effects (font (size 1 1) (thickness 0.2)))
   )
   (gr_text "BOOT" (at 90.8 83.27) (layer "F.SilkS") (tstamp 14d01ba6-ae00-49b0-9889-2f77a1936569)

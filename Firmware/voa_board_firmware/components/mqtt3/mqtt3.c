@@ -24,12 +24,11 @@
 
 #include "led_indicator.h"
 #include "led_indicator_blink_default.h"
+#include "led_indicator_voa.h"
 
 static const char *TAG = "MQTT_EXAMPLE";
 
 extern QueueHandle_t voa_attenuation_queue;
-extern led_indicator_handle_t led_state_handle;
-extern led_indicator_handle_t led_error_handle;
 
 static cJSON *settings_json;
 
@@ -60,7 +59,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     switch ((esp_mqtt_event_id_t)event_id)
     {
     case MQTT_EVENT_CONNECTED:
-        led_indicator_start(led_state_handle, BLINK_CONNECTED);
+        voa_indicator_set_state(BLINK_CONNECTED);
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
         // send data to topic
         msg_id = esp_mqtt_client_subscribe(client, "/voa_attenuation", 2);
@@ -69,7 +68,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         // ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_DISCONNECTED:
-        led_indicator_start(led_state_handle, BLINK_PROVISIONING);
+        voa_indicator_set_state(BLINK_CONNECTING);
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
         break;
 

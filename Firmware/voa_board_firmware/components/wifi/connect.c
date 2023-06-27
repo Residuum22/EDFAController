@@ -65,7 +65,7 @@ esp_err_t wifi_connect(void)
 }
 
 
-esp_err_t example_disconnect(void)
+esp_err_t wifi_disconnect(void)
 {
     example_wifi_shutdown();
     ESP_ERROR_CHECK(esp_unregister_shutdown_handler(&example_wifi_shutdown));

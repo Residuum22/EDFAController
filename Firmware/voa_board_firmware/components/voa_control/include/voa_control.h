@@ -16,4 +16,6 @@ void voa_control_adc_init();
 
 void voa_control_set_attenuation_zero();
 
+void voa_control_set_attenuation_max();
+
 void voa_control_task(void *pvParameters);

@@ -6,6 +6,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "freertos/timers.h"
 
 #include "esp_adc/adc_oneshot.h"
 #include "esp_adc/adc_cali.h"
@@ -22,7 +23,8 @@ extern QueueHandle_t voa_attenuation_queue;
 static mcpwm_gen_handle_t fwd_generators[2];
 static mcpwm_gen_handle_t rev_generators[2];
 
-typedef enum voa_mcpwm_group_id {
+typedef enum voa_mcpwm_group_id
+{
     VOA_MCPWM_GROUP_0 = 0,
     VOA_MCPWM_GROUP_1,
     VOA_MCPWM_GROUP_MAX
@@ -30,15 +32,17 @@ typedef enum voa_mcpwm_group_id {
 
 static void gen_action_config(mcpwm_gen_handle_t gena, mcpwm_gen_handle_t genb, mcpwm_cmpr_handle_t comp)
 {
-    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_timer_event(gena,
-                                                               MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, MCPWM_TIMER_EVENT_EMPTY, MCPWM_GEN_ACTION_HIGH),
-                                                               MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, MCPWM_TIMER_EVENT_FULL, MCPWM_GEN_ACTION_LOW),
-                                                               MCPWM_GEN_TIMER_EVENT_ACTION_END()));
+    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_timer_event(
+        gena,
+        MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, MCPWM_TIMER_EVENT_EMPTY, MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, MCPWM_TIMER_EVENT_FULL, MCPWM_GEN_ACTION_LOW),
+        MCPWM_GEN_TIMER_EVENT_ACTION_END()));
 
-    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_compare_event(genb,
-                                                                 MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, comp, MCPWM_GEN_ACTION_LOW),
-                                                                 MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, comp, MCPWM_GEN_ACTION_HIGH),
-                                                                 MCPWM_GEN_COMPARE_EVENT_ACTION_END()));
+    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_compare_event(
+        genb,
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, comp, MCPWM_GEN_ACTION_LOW),
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, comp, MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_COMPARE_EVENT_ACTION_END()));
 }
 
 static void timer_init(uint8_t mcpwm_group_id, mcpwm_timer_handle_t *timer)
@@ -122,7 +126,7 @@ void voa_control_init_fwd()
 
     const uint8_t gen_gpios[2] = {VOA_FWD_A_PIN, VOA_FWD_B_PIN};
     generator_init(VOA_MCPWM_GROUP_0, operators, fwd_generators, gen_gpios, comparator);
-    
+
     voa_control_disable_fwd();
 
     ESP_LOGI(TAG, "Set generator actions on timer and compare event");
@@ -146,7 +150,7 @@ void voa_control_init_rev()
 
     const uint8_t gen_gpios[2] = {VOA_REV_A_PIN, VOA_REV_B_PIN};
     generator_init(VOA_MCPWM_GROUP_1, operators, rev_generators, gen_gpios, comparator);
-    
+
     voa_control_disable_rev();
 
     ESP_LOGI(TAG, "Set generator actions on timer and compare event");
@@ -193,21 +197,56 @@ void voa_control_disable_rev()
     }
 }
 
+// This should be a low value
+// TODO: need to find the good value
+// If it is low, the noise can trigger the end values
+// If it is to high, the motor cant be set into the correct position
+#define ADC_POSITION_EPS 20
+
+// Return true if the value is greater eps
+static bool voa_control_check_eps(int current_value, int last_value)
+{
+    ESP_LOGI(TAG, "Checking VOA position values");
+    if ((current_value - last_value >= ADC_POSITION_EPS) || (last_value - current_value >= ADC_POSITION_EPS))
+    {
+        ESP_LOGI(TAG, "VOA value is changing...");
+        return true;
+    }
+    ESP_LOGI(TAG, "[WARNIN] VOA value is not changing...");
+    return false;
+}
 
 adc_cali_handle_t adc1_cali_handle = NULL;
 bool do_calibration1;
 adc_oneshot_unit_handle_t adc1_handle;
 
 #define POT_VOLTAGE 4095
+static int voa_max_adc_value = 4095;
 #define MAX_VOA_ATTENUATION_IN_V POT_VOLTAGE * 0.98
+static int voa_min_adc_value = 0;
 #define MIN_VOA_ATTENUATION_IN_V POT_VOLTAGE * 0.4
-
-static uint16_t voa_pot_min_voltage = MAX_VOA_ATTENUATION_IN_V;
-static uint16_t voa_pot_max_voltage = MIN_VOA_ATTENUATION_IN_V;
 
 // https://www.calculator.net/slope-calculator.html
 #define SLOPE 122.85
 #define CONVERT_DB_TO_VOLTAGE(x) (x * SLOPE + MIN_VOA_ATTENUATION_IN_V)
+#define CONVERT_DB_TO_VALUE(x) (x * SLOPE + voa_min_adc_value)
+
+static bool voa_stopped = false;
+
+static void voa_control_check_if_stopped()
+{
+    static int last_adc_value = 0;
+    static int current_adc_value = 0;
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &current_adc_value));
+
+    if (!voa_control_check_eps(current_adc_value, last_adc_value))
+    {
+        // Emergency shutdown
+        voa_control_disable_fwd();
+        voa_control_disable_rev();
+    }
+    last_adc_value = current_adc_value;
+}
 
 void voa_control_adc_init()
 {
@@ -228,22 +267,57 @@ void voa_control_adc_init()
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_0, &config));
 }
 
+TimerHandle_t sw_timer;
+int id = 1;
+// This period between 1-3 to prevent the voa coil burn down.
+#define TIMER_CHECK_INTERVALL 1000
+
 void voa_control_set_attenuation_zero()
 {
-    int adc_value = 0;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+    // Call timer if stopped function on the first run
+    voa_control_check_if_stopped();
 
-    while (adc_value > MIN_VOA_ATTENUATION_IN_V)
-    {
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
-        ESP_LOGI(TAG, "Set VOA in the default state");
-        ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC_CHANNEL_0, adc_value);
-        voa_control_disable_fwd();
-        voa_control_enable_rev();
-    }
-    voa_control_disable_rev();
+    // Start to decrease attenuation
+    voa_stopped = false;
+    voa_control_disable_fwd();
+    voa_control_enable_rev();
+
+    // Start timer
+    xTimerStart(sw_timer, 0);
+
+    while (!voa_stopped);
+    voa_stopped = false;
+    // After this the voa should be stopped.
+
+    xTimerStop(sw_timer, 0);
+
+    // Store min value
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &voa_min_adc_value));
 }
 
+void voa_control_set_attenuation_max()
+{
+    // Call timer if stopped function on the first run
+    voa_control_check_if_stopped();
+
+    // Start to decrease attenuation
+    voa_stopped = false;
+    voa_control_enable_fwd();
+    voa_control_disable_rev();
+
+    // Start timer
+    xTimerStart(sw_timer, 0);
+
+    // This value is modified with the timer handler function namely voa_control_check_if_stopped
+    while (!voa_stopped);
+    voa_stopped = false;
+    // After this the voa should be stopped.
+
+    xTimerStop(sw_timer, 0);
+
+    // Store min value
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &voa_max_adc_value));
+}
 
 void voa_control_task(void *pvParameters)
 {
@@ -267,41 +341,62 @@ void voa_control_task(void *pvParameters)
     gpio_config(&io_conf);
     // End of TODO
 
-    voa_control_set_attenuation_zero();
+    // Init timer for error/end position ending
+    sw_timer = xTimerCreate("VOA Timer", pdMS_TO_TICKS(TIMER_CHECK_INTERVALL), pdTRUE, (void *)id, &voa_control_check_if_stopped);
 
-    int last_adc_value = MIN_VOA_ATTENUATION_IN_V;
+    voa_control_set_attenuation_zero();
+    voa_control_set_attenuation_max();
 
     for (;;)
     {
         xQueueReceive(voa_attenuation_queue, &attenuation, portMAX_DELAY);
         ESP_LOGI(TAG, "Attenuation: %d", attenuation);
-        int espected_raw = CONVERT_DB_TO_VOLTAGE(attenuation);
-        if (espected_raw > MAX_VOA_ATTENUATION_IN_V)
-        {
-            espected_raw = MAX_VOA_ATTENUATION_IN_V;
-        }
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+        int espected_raw = CONVERT_DB_TO_VALUE(attenuation);
+        
 
-        if (last_adc_value < espected_raw)
+        // Check if the attenuation is greater than the maximum value
+        if (espected_raw > voa_max_adc_value)
         {
+            espected_raw = voa_max_adc_value;
+        }
+
+        // Check if the attenuation is less than the minimum value
+        if (espected_raw < voa_min_adc_value)
+        {
+            espected_raw = voa_min_adc_value;
+        }
+
+
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+        xTimerStart(sw_timer, 0);
+
+        if (adc_value < espected_raw)
+        {
+            // if the initial state of the VOA pot is less then the expected -> move forward
             voa_control_disable_rev();
             voa_control_enable_fwd();
-            while (adc_value < espected_raw)
-            {
+            while (adc_value < espected_raw || !voa_stopped)
+            {        
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
             }
         }
         else
         {
+            // Move backward
             voa_control_disable_fwd();
             voa_control_enable_rev();
-            while (adc_value > espected_raw)
+            while (adc_value > espected_raw || !voa_stopped)
             {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
             }
         }
 
-        last_adc_value = adc_value;
+        if (voa_stopped)
+        {
+            assert(false);
+        }
+
+        xTimerStop(sw_timer, 0);
         voa_control_disable_fwd();
         voa_control_disable_rev();
     }

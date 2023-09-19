@@ -20,7 +20,7 @@ static const char *TAG = "MAIN";
 
 QueueHandle_t voa_attenuation_queue;
 
-static void voa_attenuation_queue_init()
+static inline void voa_attenuation_queue_init()
 {
     // Creating an uint8_t queue with 10 elements
     voa_attenuation_queue = xQueueCreate(10, sizeof(uint8_t));
@@ -38,9 +38,6 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Initialize LED indicator...");
     voa_indicator_init();
-
-    ESP_LOGI(TAG, "Initialize ADC...");
-    voa_control_adc_init();
 
     ESP_LOGI(TAG, "Connect to the wifi network...");
     ESP_ERROR_CHECK(wifi_connect());

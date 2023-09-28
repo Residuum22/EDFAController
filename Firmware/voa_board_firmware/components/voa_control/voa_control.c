@@ -13,6 +13,12 @@
 #include "esp_adc/adc_cali_scheme.h"
 #include "driver/gpio.h"
 
+#include "led_indicator.h"
+#include "led_indicator_blink_default.h"
+#include "led_indicator_voa.h"
+
+#include "mqtt3.h"
+
 #include <math.h>
 
 static const char *TAG = "VOA_CONTROL";
@@ -37,8 +43,10 @@ static const char *TAG = "VOA_CONTROL";
 #if CONFIG_USE_EPS_VAR
 int adc_position_eps;
 #else
-#define ADC_POSITION_EPS 20
+#define ADC_POSITION_EPS 10
 #endif
+
+#define ADC_STUCKED_EPS 20
 
 // TODO: This period between 1-3 to prevent the voa coil burn down.
 #define TIMER_CHECK_INTERVALL 1000
@@ -76,6 +84,9 @@ static adc_oneshot_unit_handle_t adc1_handle;
 static int voa_max_adc_value = 4095;
 static int voa_min_adc_value = 0;
 static bool voa_stopped = false;
+static bool voa_stucked = false;
+
+static int current_adc_value = 0;
 
 // Automatic end position mapper software timer handler
 static TimerHandle_t sw_timer;
@@ -296,8 +307,6 @@ static int last_adc_value = 0;
  */
 static void voa_control_check_if_stopped(TimerHandle_t xTimer)
 {
-    int current_adc_value = 0;
-
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &current_adc_value));
 
     if (!voa_control_is_moving(current_adc_value, last_adc_value))
@@ -306,8 +315,15 @@ static void voa_control_check_if_stopped(TimerHandle_t xTimer)
         voa_control_disable_fwd();
         voa_control_disable_rev();
         voa_stopped = true;
-    }
 
+        // If VOA stopped in the middle of min and max then it stucked so 
+        int min_diff = abs(current_adc_value - voa_min_adc_value);
+        int max_diff = abs(current_adc_value - voa_max_adc_value);
+        if (min_diff >= ADC_STUCKED_EPS || max_diff >= ADC_STUCKED_EPS)
+        {
+            voa_stucked = true;
+        }
+    }
     last_adc_value = current_adc_value;
 }
 //*****************************************************************************
@@ -427,11 +443,16 @@ void voa_control_set_attenuation_zero()
     voa_control_enable_rev();
 
     // Start timer
+    // Before timer start current_adc_value need to be cleared
+    current_adc_value = 0;
     xTimerStart(sw_timer, 0);
 
     // Global variable for communication the timer will set this true
     while (!voa_stopped)
-        ;
+    {
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+
     voa_stopped = false;
     // After this the voa should be stopped.
 
@@ -450,11 +471,15 @@ void voa_control_set_attenuation_max()
     voa_control_disable_rev();
 
     // Start timer
+    // Before timer start current_adc_value need to be cleared
+    current_adc_value = 0;
     xTimerStart(sw_timer, 0);
 
     // This value is modified with the timer handler function namely voa_control_check_if_stopped
     while (!voa_stopped)
-        ;
+    {
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
     voa_stopped = false;
     // After this the voa should be stopped.
 
@@ -487,8 +512,8 @@ void voa_control_task(void *pvParameters)
     for (;;)
     {
         xQueueReceive(voa_attenuation_queue, &attenuation, portMAX_DELAY);
-        ESP_LOGI(TAG, "Attenuation: %d", attenuation);
         int espected_raw = CONVERT_DB_TO_VALUE(attenuation);
+        ESP_LOGI(TAG, "Attenuation in raw value: %d", espected_raw);
 
         // Check if the attenuation is greater than the maximum value
         if (espected_raw > voa_max_adc_value)
@@ -502,6 +527,9 @@ void voa_control_task(void *pvParameters)
         }
 
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+
+        // Before timer start current_adc_value need to be cleared
+        current_adc_value = 0;
         xTimerStart(sw_timer, 0);
 
         if (adc_value < espected_raw)
@@ -509,9 +537,11 @@ void voa_control_task(void *pvParameters)
             // if the initial state of the VOA pot is less then the expected -> move forward
             voa_control_disable_rev();
             voa_control_enable_fwd();
-            while (adc_value < espected_raw || !voa_stopped)
+            while (last_adc_value < espected_raw || !voa_stopped)
             {
-                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+                vTaskDelay(100);
+                // Wait here until the last value is updated
+                //ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
             }
         }
         else
@@ -519,15 +549,20 @@ void voa_control_task(void *pvParameters)
             // Move backward
             voa_control_disable_fwd();
             voa_control_enable_rev();
-            while (adc_value > espected_raw || !voa_stopped)
+            while (last_adc_value > espected_raw || !voa_stopped)
             {
-                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+                vTaskDelay(100);
+                // Wait here until the last value is updated
+                //ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
             }
         }
 
-        if (voa_stopped)
+        if (voa_stucked)
         {
-            // TODO: Check this one because the voa can stuck.
+            xTimerStop(sw_timer, 0);
+            voa_indicator_set_error(BLINK_CONNECTED);
+            ESP_LOGE(TAG, "!!!VOA Stucked!!! Check error and reset board!");
+            // FIXME: Implement better error handling
             assert(false);
         }
 

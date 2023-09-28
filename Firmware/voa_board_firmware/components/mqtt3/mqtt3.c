@@ -35,6 +35,8 @@ extern QueueHandle_t voa_eps_queue;
 
 static cJSON *settings_json;
 
+static esp_mqtt_client_handle_t client;
+
 static void log_error_if_nonzero(const char *message, int error_code)
 {
     if (error_code != 0)
@@ -106,7 +108,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
             uint8_t attenuation = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "attenuation"));
             if (attenuation <= 20)
             {
-                ESP_LOGI(TAG, "attenuation: %d", attenuation);
+                ESP_LOGI(TAG, "Attenuation: %d dB", attenuation);
                 xQueueSend(voa_attenuation_queue, &attenuation, 10);
             }
             else
@@ -137,8 +139,13 @@ void mqtt_app_start(void)
         .broker.address.uri = CONFIG_BROKER_URL,
     };
 
-    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
+    client = esp_mqtt_client_init(&mqtt_cfg);
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
     esp_mqtt_client_start(client);
+}
+
+void mqtt_app_stop(void)
+{
+    esp_mqtt_client_stop(client);
 }

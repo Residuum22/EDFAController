@@ -3,6 +3,10 @@
 #include "common_private.h"
 #include "esp_log.h"
 
+#include "led_indicator.h"
+#include "led_indicator_blink_default.h"
+#include "led_indicator_voa.h"
+
 static const char *TAG = "NETWORK_WIFI";
 static esp_netif_t *s_example_sta_netif = NULL;
 static SemaphoreHandle_t s_semph_get_ip_addrs = NULL;
@@ -41,12 +45,17 @@ static void example_handler_on_wifi_disconnect(void *arg, esp_event_base_t event
 {
     s_retry_num++;
     if (s_retry_num > CONFIG_EXAMPLE_WIFI_CONN_MAX_RETRY) {
-        ESP_LOGI(TAG, "WiFi Connect failed %d times, stop reconnect.", s_retry_num);
-        /* let example_wifi_sta_do_connect() return */
-        if (s_semph_get_ip_addrs) {
-            xSemaphoreGive(s_semph_get_ip_addrs);
-        }
-        return;
+        ESP_LOGE(TAG, "WiFi Connect failed %d times, stop reconnect.", s_retry_num);
+        ESP_LOGE(TAG, "Asserting... Reset device or check WIFI availability.");
+        voa_indicator_set_error(BLINK_CONNECTED);
+        // FIXME: Implement better failure handling handling.
+        assert(false);
+
+        // /* let example_wifi_sta_do_connect() return */
+        // if (s_semph_get_ip_addrs) {
+        //     xSemaphoreGive(s_semph_get_ip_addrs);
+        // }
+        // return;
     }
     ESP_LOGI(TAG, "Wi-Fi disconnected, trying to reconnect...");
     esp_err_t err = esp_wifi_connect();
@@ -93,6 +102,8 @@ void example_wifi_start(void)
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
+
+    voa_indicator_set_state(BLINK_CONNECTING);
 }
 
 

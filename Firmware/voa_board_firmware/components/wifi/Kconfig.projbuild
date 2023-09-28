@@ -19,7 +19,7 @@ menu "Example Connection Configuration"
 
     config EXAMPLE_WIFI_CONN_MAX_RETRY
         int "Maximum retry"
-        default 6
+        default 255
         help
             Set the Maximum retry to avoid station reconnecting to the AP unlimited,
             in case the AP is really inexistent.
@@ -51,7 +51,7 @@ menu "Example Connection Configuration"
 
         choice EXAMPLE_WIFI_SCAN_AUTH_MODE_THRESHOLD
             prompt "WiFi Scan auth mode threshold"
-            default EXAMPLE_WIFI_AUTH_OPEN
+            default EXAMPLE_WIFI_AUTH_WPA2_PSK
             help
                 The weakest authmode to accept in the scan mode.
 

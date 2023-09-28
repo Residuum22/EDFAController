@@ -34,7 +34,11 @@ static const char *TAG = "VOA_CONTROL";
 // TODO: need to find the good value
 // If it is low, the noise can trigger the end values
 // If it is to high, the motor cant be set into the correct position
+#if CONFIG_USE_EPS_VAR
+int adc_position_eps;
+#else
 #define ADC_POSITION_EPS 20
+#endif
 
 // TODO: This period between 1-3 to prevent the voa coil burn down.
 #define TIMER_CHECK_INTERVALL 1000
@@ -265,7 +269,11 @@ static bool voa_control_is_moving(int current_value, int last_value)
     ESP_LOGI(TAG, "Checking VOA position values");
     int difference = abs(last_value - current_value);
 
+#if CONFIG_USE_EPS_VAR
+    if (difference <= adc_position_eps)
+#else
     if (difference <= ADC_POSITION_EPS)
+#endif
     {
         ESP_LOGI(TAG, "[WARNING] VOA value is not changing...");
         return false;

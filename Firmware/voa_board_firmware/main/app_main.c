@@ -19,11 +19,19 @@
 static const char *TAG = "MAIN";
 
 QueueHandle_t voa_attenuation_queue;
+#if CONFIG_USE_EPS_VAR
+QueueHandle_t voa_eps_queue;
+#endif
 
-static inline void voa_attenuation_queue_init()
+extern int adc_position_eps;
+
+static inline void voa_queues_init()
 {
     // Creating an uint8_t queue with 10 elements
     voa_attenuation_queue = xQueueCreate(10, sizeof(uint8_t));
+#if CONFIG_USE_EPS_VAR
+    voa_eps_queue = xQueueCreate(10, sizeof(uint8_t));
+#endif
 }
 
 void app_main(void)
@@ -45,9 +53,14 @@ void app_main(void)
     ESP_LOGI(TAG, "Start MQTT client...");
     mqtt_app_start();
 
-    ESP_LOGI(TAG, "Initialize VOA attenuation queue...");
-    voa_attenuation_queue_init();
+    ESP_LOGI(TAG, "Initialize VOA queues...");
+    voa_queues_init();
 
+#if CONFIG_USE_EPS_VAR
+    // Wait for eps value
+    xQueueReceive(voa_eps_queue, &adc_position_eps, portMAX_DELAY);
+#endif
+    
     ESP_LOGI(TAG, "Start VOA control task...");
     xTaskCreate(voa_control_task, "voa_control_task", 4096, NULL, 5, NULL);
 

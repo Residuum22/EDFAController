@@ -29,6 +29,9 @@
 static const char *TAG = "MQTT_EXAMPLE";
 
 extern QueueHandle_t voa_attenuation_queue;
+#if CONFIG_USE_EPS_VAR
+extern QueueHandle_t voa_eps_queue;
+#endif
 
 static cJSON *settings_json;
 
@@ -86,17 +89,30 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     case MQTT_EVENT_DATA:
         ESP_LOGI(TAG, "MQTT_EVENT_DATA");
         if (settings_json != NULL)
+        {
             cJSON_Delete(settings_json);
-        settings_json = cJSON_Parse(event->data);
-        uint8_t attenuation = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "attenuation"));
-        if (attenuation <= 20)
-        {
-            ESP_LOGI(TAG, "attenuation: %d", attenuation);
-            xQueueSend(voa_attenuation_queue, &attenuation, 10);
         }
-        else
+        settings_json = cJSON_Parse(event->data);
+#if CONFIG_USE_EPS_VAR
+        if (cJSON_HasObjectItem(settings_json, "voa_eps"))
         {
-            ESP_LOGE(TAG, "Parse JSON error or invalid attenuation value");
+            uint8_t voa_eps = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "voa_eps"));
+            ESP_LOGI(TAG, "VOA new eps: %d", voa_eps);
+            xQueueSend(voa_eps_queue, &voa_eps, 10);
+        }
+#endif
+        if (cJSON_HasObjectItem(settings_json, "attenuation"))
+        {
+            uint8_t attenuation = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "attenuation"));
+            if (attenuation <= 20)
+            {
+                ESP_LOGI(TAG, "attenuation: %d", attenuation);
+                xQueueSend(voa_attenuation_queue, &attenuation, 10);
+            }
+            else
+            {
+                ESP_LOGE(TAG, "Parse JSON error or invalid attenuation value");
+            }
         }
         break;
     case MQTT_EVENT_ERROR:

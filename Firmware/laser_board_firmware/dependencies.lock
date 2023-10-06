@@ -1,0 +1,15 @@
+dependencies:
+  espressif/cmake_utilities:
+    component_hash: 6983933aa165d5c1bd8ff3716f8873b4dd8577020d9176d22d8568b139ff8753
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 0.1.0
+  idf:
+    component_hash: null
+    source:
+      type: idf
+    version: 5.0.1
+manifest_hash: 4ef8fbc21846e0093c6af27faacdf3fc39b8cc5879a53189c019dd599e184288
+target: esp32
+version: 1.0.0

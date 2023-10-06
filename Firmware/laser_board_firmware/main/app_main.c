@@ -8,22 +8,24 @@
 
 #include "wifi_common.h"
 #include "mqtt3.h"
-#include "voa_control.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
-#include "led_indicator_voa.h"
+#include "laser_module_adc.h"
+
+#include "led_indicator_laser.h"
 
 static const char *TAG = "MAIN";
 
-QueueHandle_t voa_attenuation_queue;
+static QueueHandle_t peltier1_desired_temp_queue, peltier2_desired_temp_queue;
 
-static void voa_attenuation_queue_init()
+static void laser_module_queues_init()
 {
     // Creating an uint8_t queue with 10 elements
-    voa_attenuation_queue = xQueueCreate(10, sizeof(uint8_t));
+    peltier1_desired_temp_queue = xQueueCreate(10, sizeof(uint8_t));
+    peltier2_desired_temp_queue = xQueueCreate(10, sizeof(uint8_t));
 }
 
 void app_main(void)
@@ -40,7 +42,7 @@ void app_main(void)
     voa_indicator_init();
 
     ESP_LOGI(TAG, "Initialize ADC...");
-    voa_control_adc_init();
+    laser_module_adc_init();
 
     ESP_LOGI(TAG, "Connect to the wifi network...");
     ESP_ERROR_CHECK(wifi_connect());
@@ -49,10 +51,10 @@ void app_main(void)
     mqtt_app_start();
 
     ESP_LOGI(TAG, "Initialize VOA attenuation queue...");
-    voa_attenuation_queue_init();
+    laser_module_queues_init();
 
     ESP_LOGI(TAG, "Start VOA control task...");
-    xTaskCreate(voa_control_task, "voa_control_task", 4096, NULL, 5, NULL);
+    //xTaskCreate(voa_control_task, "voa_control_task", 4096, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "Initialization done.");
 }

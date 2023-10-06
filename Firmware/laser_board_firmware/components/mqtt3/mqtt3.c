@@ -24,11 +24,9 @@
 
 #include "led_indicator.h"
 #include "led_indicator_blink_default.h"
-#include "led_indicator_voa.h"
+#include "led_indicator_laser.h"
 
 static const char *TAG = "MQTT_EXAMPLE";
-
-extern QueueHandle_t voa_attenuation_queue;
 
 static cJSON *settings_json;
 
@@ -84,20 +82,20 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
         break;
     case MQTT_EVENT_DATA:
-        ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-        if (settings_json != NULL)
-            cJSON_Delete(settings_json);
-        settings_json = cJSON_Parse(event->data);
-        uint8_t attenuation = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "attenuation"));
-        if (attenuation <= 20)
-        {
-            ESP_LOGI(TAG, "attenuation: %d", attenuation);
-            xQueueSend(voa_attenuation_queue, &attenuation, 10);
-        }
-        else
-        {
-            ESP_LOGE(TAG, "Parse JSON error or invalid attenuation value");
-        }
+        // ESP_LOGI(TAG, "MQTT_EVENT_DATA");
+        // if (settings_json != NULL)
+        //     cJSON_Delete(settings_json);
+        // settings_json = cJSON_Parse(event->data);
+        // uint8_t attenuation = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "attenuation"));
+        // if (attenuation <= 20)
+        // {
+        //     ESP_LOGI(TAG, "attenuation: %d", attenuation);
+        //     xQueueSend(voa_attenuation_queue, &attenuation, 10);
+        // }
+        // else
+        // {
+        //     ESP_LOGE(TAG, "Parse JSON error or invalid attenuation value");
+        // }
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");

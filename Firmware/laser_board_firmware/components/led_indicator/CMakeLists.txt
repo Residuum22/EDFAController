@@ -2,7 +2,7 @@ set(srcs "src/led_ledc.c"
         "src/led_gpio.c"
         "src/led_indicator.c"
         "src/led_indicator_blink_default.c"
-        "src/led_indicator_voa.c"
+        "src/led_indicator_laser.c"
         )
 
 idf_component_register(SRCS ${srcs}

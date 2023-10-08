@@ -12,7 +12,7 @@ static int state_led_blink_prev = BLINK_MAX;
 static int error_led_blink_prev = BLINK_MAX;
 
 
-void voa_indicator_init()
+void laser_indicator_init()
 {
     led_indicator_gpio_config_t led_state_gpio_config = {
         .is_active_level_high = true,
@@ -39,7 +39,7 @@ void voa_indicator_init()
     led_error_handle = led_indicator_create(&led_error_config);
 }
 
-void voa_indicator_set_state(int blink_type)
+void laser_indicator_set_state(int blink_type)
 {
     if (state_led_blink_prev != BLINK_MAX)
     {
@@ -49,9 +49,9 @@ void voa_indicator_set_state(int blink_type)
     state_led_blink_prev = blink_type;
 }
 
-void voa_indicator_set_error(int blink_type)
+void laser_indicator_set_error(int blink_type)
 {
-    voa_indicator_set_state(BLINK_PROVISIONED);
+    laser_indicator_set_state(BLINK_INDICATE_NONE);
     if (error_led_blink_prev != BLINK_MAX)
     {
         led_indicator_stop(led_error_handle, error_led_blink_prev);

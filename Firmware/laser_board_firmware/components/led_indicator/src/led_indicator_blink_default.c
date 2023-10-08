@@ -1,80 +1,51 @@
-/*
- * SPDX-FileCopyrightText: 2023 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include "led_indicator.h"
 #include "led_indicator_blink_default.h"
 
 /*********************************** Config Blink List in Different Conditions ***********************************/
 /**
- * @brief connecting to AP (or Cloud)
+ * @brief State off 
  *
  */
-static const blink_step_t default_connecting[] = {
-    {LED_BLINK_HOLD, LED_STATE_ON, 200},
-    {LED_BLINK_HOLD, LED_STATE_OFF, 800},
+static const blink_step_t indicate_none[] = {
+    {LED_BLINK_HOLD, LED_STATE_OFF, 1000},
     {LED_BLINK_LOOP, 0, 0},
 };
 
 /**
- * @brief connected to AP (or Cloud) succeed
+ * @brief Indicate error
  *
  */
-static const blink_step_t default_connected[] = {
+static const blink_step_t indicate_error[] = {
     {LED_BLINK_HOLD, LED_STATE_ON, 1000},
     {LED_BLINK_LOOP, 0, 0},
 };
 
 /**
- * @brief reconnecting to AP (or Cloud), if lose connection
+ * @brief Indicate WIFI connecting
  *
  */
-static const blink_step_t default_reconnecting[] = {
-    {LED_BLINK_HOLD, LED_STATE_ON, 100},
-    {LED_BLINK_HOLD, LED_STATE_OFF, 200},
-    {LED_BLINK_LOOP, 0, 0},
-}; //offline
-
-/**
- * @brief updating software
- *
- */
-static const blink_step_t default_updating[] = {
-    {LED_BLINK_HOLD, LED_STATE_ON, 50},
-    {LED_BLINK_HOLD, LED_STATE_OFF, 100},
-    {LED_BLINK_HOLD, LED_STATE_ON, 50},
+static const blink_step_t wifi_connecting[] = {
+    {LED_BLINK_HOLD, LED_STATE_ON, 200},
     {LED_BLINK_HOLD, LED_STATE_OFF, 800},
     {LED_BLINK_LOOP, 0, 0},
 };
 
 /**
- * @brief restoring factory settings
+ * @brief Indicate MQTT connecting
  *
  */
-static const blink_step_t default_factory_reset[] = {
-    {LED_BLINK_HOLD, LED_STATE_ON, 200},
-    {LED_BLINK_HOLD, LED_STATE_OFF, 200},
+static const blink_step_t mqtt_connecting[] = {
+    {LED_BLINK_HOLD, LED_STATE_ON, 500},
+    {LED_BLINK_HOLD, LED_STATE_OFF, 500},
     {LED_BLINK_LOOP, 0, 0},
 };
 
 /**
- * @brief provision done
+ * @brief Indicate MQTT connected
  *
  */
-static const blink_step_t default_provisioned[] = {
-    {LED_BLINK_HOLD, LED_STATE_OFF, 1000},
-    {LED_BLINK_STOP, 0, 0},
-};
-
-/**
- * @brief provisioning
- *
- */
-static const blink_step_t default_provisioning[] = {
-    {LED_BLINK_HOLD, LED_STATE_ON, 500},
-    {LED_BLINK_HOLD, LED_STATE_OFF, 500},
+static const blink_step_t mqtt_connected[] = {
+    {LED_BLINK_HOLD, LED_STATE_ON, 1000},
     {LED_BLINK_LOOP, 0, 0},
 };
 
@@ -83,13 +54,11 @@ static const blink_step_t default_provisioning[] = {
  *
  */
 blink_step_t const *default_led_indicator_blink_lists[] = {
-    [BLINK_FACTORY_RESET] = default_factory_reset,
-    [BLINK_UPDATING] = default_updating,
-    [BLINK_CONNECTED] = default_connected,
-    [BLINK_PROVISIONED] = default_provisioned,
-    [BLINK_RECONNECTING] = default_reconnecting,
-    [BLINK_CONNECTING] = default_connecting,
-    [BLINK_PROVISIONING] = default_provisioning,
+    [BLINK_INDICATE_NONE] = indicate_none,
+    [BLINK_INDICATE_ERROR] = indicate_error,
+    [BLINK_WIFI_CONNECTING] = wifi_connecting,
+    [BLINK_MQTT_CONNECTING] = mqtt_connecting,
+    [BLINK_MQTT_CONNECTED] = mqtt_connected,
     [BLINK_MAX] = NULL,
 };
 

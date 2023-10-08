@@ -30,6 +30,13 @@ static const char *TAG = "MQTT_EXAMPLE";
 
 static cJSON *settings_json;
 
+static cJSON *laser1_json;
+static cJSON *laser2_json;
+
+extern QueueHandle_t peltier1_desired_temp_queue, peltier2_desired_temp_queue;
+extern QueueHandle_t laser1_enable_queue, laser2_enable_queue;
+extern QueueHandle_t laser1_desired_monitor_diode_queue, laser2_desired_monitor_diode_queue;
+
 static void log_error_if_nonzero(const char *message, int error_code)
 {
     if (error_code != 0)
@@ -57,16 +64,22 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     switch ((esp_mqtt_event_id_t)event_id)
     {
     case MQTT_EVENT_CONNECTED:
-        voa_indicator_set_state(BLINK_CONNECTED);
+        laser_indicator_set_state(BLINK_MQTT_CONNECTED);
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        // send data to topic
-        msg_id = esp_mqtt_client_subscribe(client, "/voa_attenuation", 2);
+        // Subscribe to Laser Module Set channal according to the LASER number
+        char laser_module_number_str[2];
+        itoa(CONFIG_LASER_MODULE_NUMBER, laser_module_number_str, 10);
+        char laser_module_set_topic[21] = "/laser_module_set/";
+        strcat(laser_module_set_topic, laser_module_number_str);
+        ESP_LOGI(TAG, "Subscribe to the \"%s\" topic!", laser_module_set_topic);
+
+        msg_id = esp_mqtt_client_subscribe(client, laser_module_set_topic, 2);
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
         // msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
         // ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_DISCONNECTED:
-        voa_indicator_set_state(BLINK_CONNECTING);
+        laser_indicator_set_state(BLINK_MQTT_CONNECTING);
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
         break;
 
@@ -82,20 +95,41 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
         break;
     case MQTT_EVENT_DATA:
-        // ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-        // if (settings_json != NULL)
-        //     cJSON_Delete(settings_json);
-        // settings_json = cJSON_Parse(event->data);
-        // uint8_t attenuation = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "attenuation"));
-        // if (attenuation <= 20)
-        // {
-        //     ESP_LOGI(TAG, "attenuation: %d", attenuation);
-        //     xQueueSend(voa_attenuation_queue, &attenuation, 10);
-        // }
-        // else
-        // {
-        //     ESP_LOGE(TAG, "Parse JSON error or invalid attenuation value");
-        // }
+        ESP_LOGI(TAG, "MQTT_EVENT_DATA");
+        if (settings_json != NULL)
+            cJSON_Delete(settings_json);
+        settings_json = cJSON_Parse(event->data);
+        // uint8_t report_interval = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "report_interval"));
+#if CONFIG_LASER_MODULE_NUMBER == 1
+        laser1_json = cJSON_GetObjectItemCaseSensitive(settings_json, "laser_976_1");
+        laser2_json = cJSON_GetObjectItemCaseSensitive(settings_json, "laser_976_2");
+#else
+        laser1_json = cJSON_GetObjectItemCaseSensitive(settings_json, "laser_1480_1");
+        laser2_json = cJSON_GetObjectItemCaseSensitive(settings_json, "laser_1480_2");
+#endif
+        // Parse enable's
+        cJSON *laser1_enable_json = cJSON_GetObjectItemCaseSensitive(laser1_json, "enabled");
+        bool laser1_enabled = cJSON_IsTrue(laser1_enable_json) == cJSON_True;
+        cJSON *laser2_enable_json = cJSON_GetObjectItemCaseSensitive(laser2_json, "enabled");
+        bool laser2_enabled = cJSON_IsTrue(laser2_enable_json) == cJSON_True;
+        ESP_LOGI(TAG, "Enable/Disable| Laser1: %d, Laser2: %d", laser1_enabled, laser2_enabled);
+        xQueueSend(laser1_enable_queue, &laser1_enabled, pdMS_TO_TICKS(10));
+        xQueueSend(laser2_enable_queue, &laser2_enabled, pdMS_TO_TICKS(10));
+
+        // Parse desired temperature
+        uint8_t laser1_desired_temp = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(laser1_json, "desired_temperature"));
+        uint8_t laser2_desired_temp = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(laser2_json, "desired_temperature"));
+        ESP_LOGI(TAG, "Desired temperature| Laser1: %d, Laser2: %d", laser1_desired_temp, laser2_desired_temp);
+        xQueueSend(peltier1_desired_temp_queue, &laser1_desired_temp, pdMS_TO_TICKS(10));
+        xQueueSend(peltier2_desired_temp_queue, &laser2_desired_temp, pdMS_TO_TICKS(10));
+
+        // Parse desired monitor diode current
+        uint32_t laser1_desired_monitor_diode = (uint32_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(laser1_json, "desired_monitor_diode_current"));
+        uint32_t laser2_desired_monitor_diode = (uint32_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(laser2_json, "desired_monitor_diode_current"));
+        ESP_LOGI(TAG, "Desired monitor diode| Laser1: %d, Laser2: %d", laser1_desired_monitor_diode, laser2_desired_monitor_diode);
+        xQueueSend(laser1_desired_monitor_diode_queue, &laser1_desired_monitor_diode, pdMS_TO_TICKS(10));
+        xQueueSend(laser2_desired_monitor_diode_queue, &laser2_desired_monitor_diode, pdMS_TO_TICKS(10));
+
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");

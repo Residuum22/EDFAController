@@ -3,6 +3,10 @@
 #include "common_private.h"
 #include "esp_log.h"
 
+#include "led_indicator.h"
+#include "led_indicator_blink_default.h"
+#include "led_indicator_laser.h"
+
 static const char *TAG = "NETWORK_WIFI";
 static esp_netif_t *s_example_sta_netif = NULL;
 static SemaphoreHandle_t s_semph_get_ip_addrs = NULL;
@@ -93,6 +97,8 @@ void example_wifi_start(void)
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
+
+    laser_indicator_set_state(BLINK_WIFI_CONNECTING);
 }
 
 

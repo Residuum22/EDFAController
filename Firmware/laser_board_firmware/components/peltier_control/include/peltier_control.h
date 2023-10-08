@@ -21,13 +21,6 @@ void peltier_control_enable_cooling();
 void peltier_control_disable_cooling();
 
 /**
- * @brief This function initialize the ADC1 pheripheral in oneshot mode.
- * The input pin is on the VOA schematics.
- * 
- */
-void voa_control_adc_init();
-
-/**
  * @brief This function is the main VOA task. In this function fwd and rev
  * MCPWM pheriheral and moving VOA to the end positons. In the main loop if the attenuation
  * value is sent then this function is responsible to set the correct value.

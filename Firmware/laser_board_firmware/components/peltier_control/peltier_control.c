@@ -21,8 +21,8 @@ static const char *TAG = "PELTIER_CONTROL";
 
 #define COMPARE_VALUE TIMER_PERIOD / 4 // Because square signal and up, down counter timer
 
-#define COMPARE_VALUE_MIN 0
-#define COMPARE_VALUE_MAX TIMER_PERIOD / 2
+#define COMPARE_VALUE_MIN 0 // 0 %
+#define COMPARE_VALUE_MAX TIMER_PERIOD / 2 // 100%
 //*****************************************************************************
 // Defines END
 //*****************************************************************************
@@ -35,12 +35,12 @@ static const char *TAG = "PELTIER_CONTROL";
 extern QueueHandle_t peltier1_desired_temp_queue, peltier2_desired_temp_queue;
 
 // ESP32 only have 2 MCPWM groups, each have 2 generator
-typedef enum voa_mcpwm_group_id
+typedef enum peltier_mcpwm_group_id
 {
-    VOA_MCPWM_GROUP_0 = 0,
-    VOA_MCPWM_GROUP_1,
-    VOA_MCPWM_GROUP_MAX
-} voa_mcpwm_group_id_t;
+    PELTIER_MCPWM_GROUP_0 = 0,
+    PELTIER_MCPWM_GROUP_1,
+    PELTIER_MCPWM_GROUP_MAX
+} peltier_mcpwm_group_id_t;
 
 // MCPWM generator handlers
 // Concept: One group for forward and one group for reverse
@@ -170,12 +170,12 @@ static void comparator_init(uint8_t mcpwm_group_id, mcpwm_oper_handle_t *operato
  * @param comparator Comparator handler
  * @param compare_value Desired compare value
  */
-static void comparator_set_compare_value(mcpwm_cmpr_handle_t *comparator, uint32_t compare_value)
+static void comparator_set_compare_value(mcpwm_cmpr_handle_t comparator, uint32_t compare_value)
 {
-    int calculated_value = (compare_value >= COMPARE_VALUE_MAX) ? COMPARE_VALUE_MAX : compare_value;
+    uint32_t calculated_value = (compare_value >= COMPARE_VALUE_MAX) ? COMPARE_VALUE_MAX : compare_value;
     calculated_value = (compare_value <= COMPARE_VALUE_MIN) ? COMPARE_VALUE_MIN : compare_value;
 
-    ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(*comparator, calculated_value));
+    ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator, calculated_value));
 }
 
 /**
@@ -219,29 +219,29 @@ void peltier_control_init_cooling()
     // Two peltier coolers are handled in one board.
     // One timer for peltier1 and one for peltier2
     mcpwm_timer_handle_t timer_group1;
-    timer_init(VOA_MCPWM_GROUP_0, &timer_group1);
+    timer_init(PELTIER_MCPWM_GROUP_0, &timer_group1);
     mcpwm_timer_handle_t timer_group2;
-    timer_init(VOA_MCPWM_GROUP_1, &timer_group2);
+    timer_init(PELTIER_MCPWM_GROUP_1, &timer_group2);
 
     // ********************* Operator initialization *********************
     mcpwm_oper_handle_t operator1;
-    operator_init(VOA_MCPWM_GROUP_0, &operator1);
+    operator_init(PELTIER_MCPWM_GROUP_0, &operator1);
     mcpwm_oper_handle_t operator2;
-    operator_init(VOA_MCPWM_GROUP_1, &operator2);
+    operator_init(PELTIER_MCPWM_GROUP_1, &operator2);
 
     // ********************* Timer and operator connection *********************
-    connect_timer_operator(VOA_MCPWM_GROUP_0, timer_group1, &operator1);
-    connect_timer_operator(VOA_MCPWM_GROUP_1, timer_group2, &operator2);
+    connect_timer_operator(PELTIER_MCPWM_GROUP_0, timer_group1, &operator1);
+    connect_timer_operator(PELTIER_MCPWM_GROUP_1, timer_group2, &operator2);
 
     // ********************* Comparator initialization *********************
-    comparator_init(VOA_MCPWM_GROUP_0, &operator1, &comparator1);
-    comparator_init(VOA_MCPWM_GROUP_1, &operator2, &comparator2);
+    comparator_init(PELTIER_MCPWM_GROUP_0, &operator1, &comparator1);
+    comparator_init(PELTIER_MCPWM_GROUP_1, &operator2, &comparator2);
 
     // ********************* GPIO initialization *********************
     const uint8_t gen_gpio1 = PELTIER1_COOLIN_PIN;
-    generator_init(VOA_MCPWM_GROUP_0, &operator1, &peltier1_cooling_generator, gen_gpio1, comparator1);
+    generator_init(PELTIER_MCPWM_GROUP_0, &operator1, &peltier1_cooling_generator, gen_gpio1, comparator1);
     const uint8_t gen_gpio2 = PELTIER2_COOLIN_PIN;
-    generator_init(VOA_MCPWM_GROUP_1, &operator2, &peltier2_cooling_generator, gen_gpio2, comparator2);
+    generator_init(PELTIER_MCPWM_GROUP_1, &operator2, &peltier2_cooling_generator, gen_gpio2, comparator2);
 
     // ********************* GPIO initialization *********************
     peltier_control_disable_cooling();
@@ -251,8 +251,8 @@ void peltier_control_init_cooling()
     gen_action_config(peltier2_cooling_generator, comparator2);
 
     // ********************* Start timer *********************
-    start_timer(VOA_MCPWM_GROUP_0, timer_group1);
-    start_timer(VOA_MCPWM_GROUP_1, timer_group2);
+    start_timer(PELTIER_MCPWM_GROUP_0, timer_group1);
+    start_timer(PELTIER_MCPWM_GROUP_1, timer_group2);
 }
 
 void peltier_control_enable_cooling()
@@ -280,6 +280,8 @@ void peltier_control_task(void *pvParameters)
 
     int32_t peltier1_diff, peltier2_diff;
 
+    peltier_control_init_cooling();
+
     for (;;)
     {
         xQueueReceive(peltier1_desired_temp_queue, &peltier1_desired_temp, pdMS_TO_TICKS(10));
@@ -294,20 +296,21 @@ void peltier_control_task(void *pvParameters)
 
         if (peltier1_diff >= 10)
         {
-            comparator_set_compare_value(&comparator1, COMPARE_VALUE_MAX / 2);
+            comparator_set_compare_value(comparator1, COMPARE_VALUE_MAX / 2);
         }
         else if (peltier1_diff >= -10)
         {
-            comparator_set_compare_value(&comparator1, 0);
+            comparator_set_compare_value(comparator1, COMPARE_VALUE_MIN);
         }
 
         if (peltier2_diff >= 10)
         {
-            comparator_set_compare_value(&comparator2, COMPARE_VALUE_MAX / 2);
+            comparator_set_compare_value(comparator2, COMPARE_VALUE_MAX / 2);
         }
         else if (peltier2_diff >= -10)
         {
-            comparator_set_compare_value(&comparator2, 0);
+            comparator_set_compare_value(comparator2, COMPARE_VALUE_MIN);
         }
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }

@@ -272,8 +272,8 @@ void peltier_control_disable_cooling()
 
 void peltier_control_task(void *pvParameters)
 {
-    uint32_t peltier1_desired_temp = 0;
-    uint32_t peltier2_desired_temp = 0;
+    uint32_t peltier1_desired_temp = 30;
+    uint32_t peltier2_desired_temp = 30;
 
     uint32_t peltier1_current_temp;
     uint32_t peltier2_current_temp;
@@ -281,6 +281,7 @@ void peltier_control_task(void *pvParameters)
     int32_t peltier1_diff, peltier2_diff;
 
     peltier_control_init_cooling();
+    peltier_control_enable_cooling();
 
     for (;;)
     {
@@ -289,25 +290,26 @@ void peltier_control_task(void *pvParameters)
 
         peltier1_current_temp = laser_module_adc_read_temp1();
         peltier2_current_temp = laser_module_adc_read_temp2();
+        // ESP_LOGI(TAG, "Laser1 temp: %d | Laser2 temp: %d", peltier1_current_temp, peltier2_current_temp);
 
         // FIXME: PID controll instead of bang bang controller
         peltier1_diff = peltier1_current_temp - peltier1_desired_temp;
         peltier2_diff = peltier2_current_temp - peltier2_desired_temp;
 
-        if (peltier1_diff >= 10)
+        if (peltier1_diff >= 5)
         {
             comparator_set_compare_value(comparator1, COMPARE_VALUE_MAX / 2);
         }
-        else if (peltier1_diff >= -10)
+        else if (peltier1_diff <= - 5)
         {
             comparator_set_compare_value(comparator1, COMPARE_VALUE_MIN);
         }
 
-        if (peltier2_diff >= 10)
+        if (peltier2_diff >= 5)
         {
             comparator_set_compare_value(comparator2, COMPARE_VALUE_MAX / 2);
         }
-        else if (peltier2_diff >= -10)
+        else if (peltier2_diff <= -5)
         {
             comparator_set_compare_value(comparator2, COMPARE_VALUE_MIN);
         }

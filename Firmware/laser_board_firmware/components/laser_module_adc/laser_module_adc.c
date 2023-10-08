@@ -12,11 +12,38 @@
 #include "esp_adc/adc_cali_scheme.h"
 #include "driver/gpio.h"
 
+#include "math.h"
+
 static const char *TAG = "LASER_ADC";
 
 // ADC1 oneshot configuration
 static bool do_calibration1;
 static adc_oneshot_unit_handle_t adc1_handle;
+
+static uint32_t convert_raw_to_temp(uint32_t value)
+{   
+    // Calculated with my Excel sheet and 
+    // http://www.learningaboutelectronics.com/Articles/NTC-thermistor-voltage-divider-temperature-calculator.php
+    // float temperature_float = value * 0.030978934324659 - 35;
+
+    // Calculated with my Excel sheet
+    float temperature_float = 5.9991 * exp(0.0007 * value);
+    return (uint32_t)floor(temperature_float);
+}
+
+static uint32_t read_laser1_raw_adc_value()
+{
+    int temperature1;
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, LASER1_TEMP_CHANNEL, &temperature1));
+    return (uint32_t)temperature1;
+}
+
+static uint32_t read_laser2_raw_adc_value()
+{
+    int temperature2;
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, LASER2_TEMP_CHANNEL, &temperature2));
+    return (uint32_t)temperature2;
+}
 
 static void inline laser_module_adc_gpio_init()
 {
@@ -66,16 +93,14 @@ void laser_module_adc_init()
 
 uint32_t laser_module_adc_read_temp1()
 {
-    int temperature1;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, LASER1_TEMP_CHANNEL, &temperature1));
-    return (uint32_t)temperature1;
+    uint32_t temp = convert_raw_to_temp(read_laser1_raw_adc_value());
+    return temp;
 }
 
 uint32_t laser_module_adc_read_temp2()
 {
-    int temperature2;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, LASER2_TEMP_CHANNEL, &temperature2));
-    return (uint32_t)temperature2;
+    uint32_t temp = convert_raw_to_temp(read_laser2_raw_adc_value());
+    return temp;
 }
 
 uint32_t laser_module_adc_read_laser1_monitor_diode()

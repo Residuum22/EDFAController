@@ -9,18 +9,18 @@
 void laser_module_adc_init();
 
 /**
- * @brief Read adc value of the laser1 temperature.
+ * @brief Read Laser 1 temperature.
  * 
  *
- * @return Raw ADC value
+ * @return Laser1 temperature
  */
 uint32_t laser_module_adc_read_temp1();
 
 /**
- * @brief Read adc value of the laser2 temperature.
+ * @brief Read Laser 2 temperature.
  * 
  *
- * @return Raw ADC value
+ * @return Laser1 temperature
  */
 uint32_t laser_module_adc_read_temp2();
 

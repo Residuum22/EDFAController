@@ -35,7 +35,7 @@ static cJSON *laser2_json;
 
 extern QueueHandle_t peltier1_desired_temp_queue, peltier2_desired_temp_queue;
 extern QueueHandle_t laser1_enable_queue, laser2_enable_queue;
-extern QueueHandle_t laser1_desired_monitor_diode_queue, laser2_desired_monitor_diode_queue;
+extern QueueHandle_t laser1_desired_current_queue, laser2_desired_current_queue;
 
 static void log_error_if_nonzero(const char *message, int error_code)
 {
@@ -124,11 +124,11 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         xQueueSend(peltier2_desired_temp_queue, &laser2_desired_temp, pdMS_TO_TICKS(10));
 
         // Parse desired monitor diode current
-        uint32_t laser1_desired_monitor_diode = (uint32_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(laser1_json, "desired_monitor_diode_current"));
-        uint32_t laser2_desired_monitor_diode = (uint32_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(laser2_json, "desired_monitor_diode_current"));
-        ESP_LOGI(TAG, "Desired monitor diode| Laser1: %d, Laser2: %d", laser1_desired_monitor_diode, laser2_desired_monitor_diode);
-        xQueueSend(laser1_desired_monitor_diode_queue, &laser1_desired_monitor_diode, pdMS_TO_TICKS(10));
-        xQueueSend(laser2_desired_monitor_diode_queue, &laser2_desired_monitor_diode, pdMS_TO_TICKS(10));
+        uint32_t laser1_desired_current = (uint32_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(laser1_json, "desired_laser_current"));
+        uint32_t laser2_desired_current = (uint32_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(laser2_json, "desired_laser_current"));
+        ESP_LOGI(TAG, "Desired monitor diode| Laser1: %d, Laser2: %d", laser1_desired_current, laser2_desired_current);
+        xQueueSend(laser1_desired_current_queue, &laser1_desired_current, pdMS_TO_TICKS(10));
+        xQueueSend(laser2_desired_current_queue, &laser2_desired_current, pdMS_TO_TICKS(10));
 
         break;
     case MQTT_EVENT_ERROR:

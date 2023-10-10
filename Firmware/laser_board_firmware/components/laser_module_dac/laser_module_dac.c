@@ -16,6 +16,22 @@
 dac_oneshot_handle_t laser1_dac_handle;
 dac_oneshot_handle_t laser2_dac_handle;
 
+static uint8_t convert_current_to_raw(uint32_t current)
+{
+    // TODO: Add conversion between the max current and the value
+    return current;
+}
+
+static void write_laser1_raw_dac_value(uint8_t dac_value)
+{
+    ESP_ERROR_CHECK(dac_oneshot_output_voltage(laser1_dac_handle, dac_value));
+}
+
+static void write_laser2_raw_dac_value(uint8_t dac_value)
+{
+    ESP_ERROR_CHECK(dac_oneshot_output_voltage(laser2_dac_handle, dac_value));
+}
+
 void laser_module_dac_init()
 {
     /* DAC oneshot init */
@@ -32,12 +48,12 @@ void laser_module_dac_init()
     ESP_ERROR_CHECK(dac_oneshot_output_voltage(laser2_dac_handle, 0));
 }
 
-void laser_module_dac_write_laser1_current(uint8_t dac_value)
+void laser_module_dac_write_laser1_current(uint32_t current)
 {
-    ESP_ERROR_CHECK(dac_oneshot_output_voltage(laser1_dac_handle, dac_value));
+    write_laser1_raw_dac_value(convert_current_to_raw(current));
 }
 
-void laser_module_dac_write_laser2_current(uint8_t dac_value)
+void laser_module_dac_write_laser2_current(uint32_t current)
 {
-    ESP_ERROR_CHECK(dac_oneshot_output_voltage(laser2_dac_handle, dac_value));
+    write_laser2_raw_dac_value(convert_current_to_raw(current));
 }

@@ -13,7 +13,7 @@ void laser_module_dac_init();
  *
  * @param[in] dac_value Raw DAC value
  */
-void laser_module_dac_write_laser1_current(uint8_t dac_value);
+void laser_module_dac_write_laser1_current(uint32_t current);
 
 /**
  * @brief Set DAC value of the Laser2
@@ -21,4 +21,4 @@ void laser_module_dac_write_laser1_current(uint8_t dac_value);
  *
  * @param[in] dac_value Raw DAC value
  */
-void laser_module_dac_write_laser2_current(uint8_t dac_value);
+void laser_module_dac_write_laser2_current(uint32_t current);

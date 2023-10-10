@@ -19,12 +19,13 @@
 #include "led_indicator_laser.h"
 
 #include "peltier_control.h"
+#include "laser_control.h"
 
 static const char *TAG = "MAIN";
 
 QueueHandle_t peltier1_desired_temp_queue, peltier2_desired_temp_queue;
 QueueHandle_t laser1_enable_queue, laser2_enable_queue;
-QueueHandle_t laser1_desired_monitor_diode_queue, laser2_desired_monitor_diode_queue;
+QueueHandle_t laser1_desired_current_queue, laser2_desired_current_queue;
 
 static void laser_module_queues_init()
 {
@@ -35,8 +36,8 @@ static void laser_module_queues_init()
     laser1_enable_queue = xQueueCreate(10, sizeof(bool));
     laser2_enable_queue = xQueueCreate(10, sizeof(bool));
 
-    laser1_desired_monitor_diode_queue = xQueueCreate(10, sizeof(uint32_t));
-    laser2_desired_monitor_diode_queue = xQueueCreate(10, sizeof(uint32_t));
+    laser1_desired_current_queue = xQueueCreate(10, sizeof(uint32_t));
+    laser2_desired_current_queue = xQueueCreate(10, sizeof(uint32_t));
 }
 
 void app_main(void)
@@ -69,6 +70,9 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Start Peltier control task...");
     xTaskCreate(peltier_control_task, "peltier_control_task", 4096, NULL, 5, NULL);
+
+    ESP_LOGI(TAG, "Start Laser current control task...");
+    xTaskCreate(laser_control_task, "laser_control_task", 4096, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "Initialization done.");
 }

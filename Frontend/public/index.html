@@ -68,28 +68,25 @@
                 <input class="form-check-input" type="checkbox" role="switch"
                   id="laser_id_{{laser_id}}_on_off_switch"
                   onclick="enable_disable_laser_id('{{laser_id}}')">
-                <label class="form-check-label" for="laser_id_{{laser_id}}_on_off_switch">{{laser_id}}
-                  engedélyezése/tiltása</label>
+                <label class="form-check-label" for="laser_id_{{laser_id}}_on_off_switch">{{laser_id}} engedélyezése/tiltása</label>
               </div>
-              <p class="card-text" id="laser_id_{{laser_id}}_monitor_diode_current">Monitor dióda árama: 0
-                µA</p>
               <div class="row">
                 <div class="col-sm-8">
                   <p class="card-text" id="laser_module_{{laser_id}}_monitor_diode_desired_current">
-                    Kívánt monitor dióda árama: 0 µA
+                    Kívánt lézer dióda árama: 0 mA
                   </p>
                 </div>
                 <div class="col">
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-secondary"
-                      onclick="increment_monitor_diode_desired_current('{{laser_id}}')">+</button>
+                    onclick="increment_laser_diode_desired_current('{{laser_id}}')">+</button>
                     <button type="button" class="btn btn-secondary"
-                      onclick="decrement_monitor_diode_desired_current('{{laser_id}}')">-</button>
+                    onclick="decrement_laser_diode_desired_current('{{laser_id}}')">-</button>
                   </div>
                 </div>
               </div>
               <p class="card-text" id="laser_id_{{laser_id}}_temperature">Hőmérséklet: 0 °C</p>
-              <p class="card-text" id="laser_id_{{laser_id}}_laser_current">Lézer dióda becsült árama: 0 mA
+              <p class="card-text" id="laser_id_{{laser_id}}_monitor_diode_current">Becsült monitor dióda árama: 0 µA</p>
               </p>
               {% endfor %}
             <!-- Module emergency shutdown -->

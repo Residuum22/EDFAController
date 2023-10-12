@@ -37,7 +37,7 @@ class laser_module_data_set(BaseModel):
     laser_id: str
     enabled: bool
     desired_temperature: int
-    desired_monitor_diode_current: int
+    desired_laser_diode_current: int
 
 class laser_module_data_set_module_976(BaseModel):
     report_interval: int
@@ -194,53 +194,53 @@ async def set_laser_module_desired_temperature(id: int, desired_temperature: int
         json_data = jsonable_encoder(laser_module_3_set)
         mqtt.publish('/laser_module_set/3', json.dumps(json_data))
       
-@app.post("/set_laser_id_desired_mon_cur/{id}")
-async def set_laser_id_desired_mon_cur(id: str, current: int):
+@app.post("/set_laser_id_desired_cur/{id}")
+async def set_laser_id_desired_cur(id: str, current: int):
     print(f"Laser {id} monitor diode current change to {current} uA")
     if id == 'LD1':
-        laser_module_1_set.laser_976_1.desired_monitor_diode_current = current
+        laser_module_1_set.laser_976_1.desired_laser_diode_current = current
         mqtt.publish('/laser_module_set/1', jsonable_encoder(laser_module_1_set))
     elif id == 'LD2':
-        laser_module_2_set.laser_1480_1.desired_monitor_diode_current = current
+        laser_module_2_set.laser_1480_1.desired_laser_diode_current = current
         mqtt.publish('/laser_module_set/2', jsonable_encoder(laser_module_2_set))
     elif id == 'LD3':
-        laser_module_2_set.laser_1480_2.desired_monitor_diode_current = current
+        laser_module_2_set.laser_1480_2.desired_laser_diode_current = current
         mqtt.publish('/laser_module_set/2', jsonable_encoder(laser_module_2_set))
     elif id == 'LD4':
-        laser_module_3_set.laser_1480_1.desired_monitor_diode_current = current
+        laser_module_3_set.laser_1480_1.desired_laser_diode_current = current
         mqtt.publish('/laser_module_set/3', jsonable_encoder(laser_module_3_set))
     elif id == 'LD5':
-        laser_module_3_set.laser_1480_2.desired_monitor_diode_current = current
+        laser_module_3_set.laser_1480_2.desired_laser_diode_current = current
         mqtt.publish('/laser_module_set/3', jsonable_encoder(laser_module_3_set))
     elif id == 'LD6':
-        laser_module_1_set.laser_976_2.desired_monitor_diode_current = current
+        laser_module_1_set.laser_976_2.desired_laser_diode_current = current
         mqtt.publish('/laser_module_set/1', jsonable_encoder(laser_module_1_set))
             
 @app.post("/emergency_stop_laser_id/{id}")
 async def emergency_stop_laser_id(id: str):
     if id == 'LD1':
         laser_module_1_set.laser_976_1.enabled = False
-        laser_module_1_set.laser_976_1.desired_monitor_diode_current = 0
+        laser_module_1_set.laser_976_1.desired_laser_diode_current = 0
         mqtt.publish('/laser_module_set/1', jsonable_encoder(laser_module_1_set))
     elif id == 'LD2':
         laser_module_2_set.laser_1480_1.enabled = False
-        laser_module_2_set.laser_1480_1.desired_monitor_diode_current = 0
+        laser_module_2_set.laser_1480_1.desired_laser_diode_current = 0
         mqtt.publish('/laser_module_set/2', jsonable_encoder(laser_module_2_set))
     elif id == 'LD3':
         laser_module_2_set.laser_1480_2.enabled = False
-        laser_module_2_set.laser_1480_2.desired_monitor_diode_current = 0
+        laser_module_2_set.laser_1480_2.desired_laser_diode_current = 0
         mqtt.publish('/laser_module_set/2', jsonable_encoder(laser_module_2_set))
     elif id == 'LD4':
         laser_module_3_set.laser_1480_1.enabled = False
-        laser_module_3_set.laser_1480_1.desired_monitor_diode_current = 0
+        laser_module_3_set.laser_1480_1.desired_laser_diode_current = 0
         mqtt.publish('/laser_module_set/3', jsonable_encoder(laser_module_3_set))
     elif id == 'LD5':
         laser_module_3_set.laser_1480_2.enabled = False
-        laser_module_3_set.laser_1480_2.desired_monitor_diode_current = 0
+        laser_module_3_set.laser_1480_2.desired_laser_diode_current = 0
         mqtt.publish('/laser_module_set/3', jsonable_encoder(laser_module_3_set))
     elif id == 'LD6':
         laser_module_1_set.laser_976_2.enabled = False
-        laser_module_1_set.laser_976_2.desired_monitor_diode_current = 0
+        laser_module_1_set.laser_976_2.desired_laser_diode_current = 0
         mqtt.publish('/laser_module_set/1', jsonable_encoder(laser_module_1_set))
         
 @app.post("/set_voa_module_attenuation/{attenuation}")

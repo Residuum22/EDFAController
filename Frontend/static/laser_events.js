@@ -2,7 +2,10 @@ const laser_module_desired_temperature_offset = 5;
 const laser_module_desired_monitor_diode_offset = 250;
 const HOST = "http://localhost:8000"
 
-
+/**
+ * This function is a generic function which can send data to
+ * the backend. 
+ */
 function post_call(path, json_body, callback) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -16,32 +19,43 @@ function post_call(path, json_body, callback) {
     xhttp.send(JSON.stringify(json_body));
 }
 
+/**
+ * Send desired temperature from the frontend to the backend
+ */
 function send_desTemp_backend(laser_id, desTemp) {
     let path = "/set_laser_module_desired_temperature/" + laser_id + '?' + 'desired_temperature=' + desTemp;
     post_call_voa(path, null, null);
 }
 
+/**
+ * Send desired monitor current from the frontend to the backend
+ */
 function send_desMonCur_backend(laser_id, desMonCur) {
-    let path = "/set_laser_id_desired_mon_cur/" + laser_id + '?' + 'current=' + desMonCur;
+    let path = "/set_laser_id_desired_cur/" + laser_id + '?' + 'current=' + desMonCur;
     post_call_voa(path, null, null);
 }
 
-function send_enable_backend(laser_id, state) {
-    let path = "/enable_disable_laser_id/" + laser_id + "?" + "state="+ state;
-    post_call(path, null, null);
-}
-
+/**
+ * Disable laser in emergency case
+ */
 function send_emerg_stop_backend(laser_id) {
     let path = "/emergency_stop_laser_id/" + laser_id;
     post_call(path, null, null);
 }
 
+/**
+ * Enable / disable laser end send to the backend
+ */
 function enable_disable_laser_id(laser_id) {
     let laser_id_name = `laser_id_${laser_id}_on_off_switch`;
     let state = document.getElementById(laser_id_name).checked;
-    send_enable_backend(laser_id, state);
+    let path = "/enable_disable_laser_id/" + laser_id + "?" + "state="+ state;
+    post_call(path, null, null);
 }
 
+/**
+ * Increment desired temperature
+ */
 function increment_laser_desired_temperature(laser_module_id) {
     let laser_name = "laser_module_" + laser_module_id + "_desired_temperature";
     let current_desired_temperature = document.getElementById(laser_name).innerHTML;
@@ -66,8 +80,8 @@ function decrement_laser_desired_temperature(laser_module_id) {
     document.getElementById(laser_name).innerHTML = "Lézerek kívánt hőmérséklete: " + current_desired_temperature_int + " °C";
 }
 
-function increment_monitor_diode_desired_current(laser_id) {
-    let laser_name = "laser_module_" + laser_id + "_monitor_diode_desired_current";
+function increment_laser_diode_desired_current(laser_id) {
+    let laser_name = "laser_module_" + laser_id + "_laser_diode_desired_current";
     let current_desired_monitor_diode_current = document.getElementById(laser_name).innerHTML;
     let current_desired_monitor_diode_current_int = parseInt(current_desired_monitor_diode_current.match(/\d/g).join(""));
 
@@ -75,11 +89,11 @@ function increment_monitor_diode_desired_current(laser_id) {
         current_desired_monitor_diode_current_int = current_desired_monitor_diode_current_int + laser_module_desired_monitor_diode_offset;
         send_desMonCur_backend(laser_id, current_desired_monitor_diode_current_int)
     }
-    document.getElementById(laser_name).innerHTML = "Kívánt monitor dióda árama: " + current_desired_monitor_diode_current_int + " µA";
+    document.getElementById(laser_name).innerHTML = "Kívánt lézer dióda árama: " + current_desired_monitor_diode_current_int + " mA";
 }
 
-function decrement_monitor_diode_desired_current(laser_id) {
-    let laser_name = "laser_module_" + laser_id + "_monitor_diode_desired_current";
+function decrement_laser_diode_desired_current(laser_id) {
+    let laser_name = "laser_module_" + laser_id + "_laser_diode_desired_current";
     let current_desired_monitor_diode_current = document.getElementById(laser_name).innerHTML;
     let current_desired_monitor_diode_current_int = parseInt(current_desired_monitor_diode_current.match(/\d/g).join(""));
 
@@ -87,13 +101,13 @@ function decrement_monitor_diode_desired_current(laser_id) {
         current_desired_monitor_diode_current_int = current_desired_monitor_diode_current_int - laser_module_desired_monitor_diode_offset;
         send_desMonCur_backend(laser_id, current_desired_monitor_diode_current_int)
     }
-    document.getElementById(laser_name).innerHTML = "Kívánt monitor dióda árama: " + current_desired_monitor_diode_current_int + " µA";
+    document.getElementById(laser_name).innerHTML = "Kívánt lézer dióda árama: " + current_desired_monitor_diode_current_int + " mA";
 }
 
 function laser_emergency_stop(laser_id) {
     laser_id.forEach(element => {
-        let laser_name = "laser_module_" + element + "_monitor_diode_desired_current";
-        document.getElementById(laser_name).innerHTML = "Kívánt monitor dióda árama: 0 µA";
+        let laser_name = "laser_module_" + element + "_laser_diode_desired_current";
+        document.getElementById(laser_name).innerHTML = "Kívánt lézer dióda árama: 0 mA";
 
         laser_name = "laser_id_" + element + "_on_off_switch";
         document.getElementById(laser_name).checked = 0;
@@ -107,9 +121,5 @@ function update_laser_id_temp(laser_id, temp) {
 }
 
 function update_laser_id_monitor_diode_current(laser_id, current) {
-    document.getElementById(`laser_id_${laser_id}_monitor_diode_current`).innerHTML = `Monitor dióda árama: ${current} µA`;
-}
-
-function update_laser_id_laser_current(laser_id, current) {
-    document.getElementById(`laser_id_${laser_id}_laser_current`).innerHTML = `Lézer dióda becsült árama: ${current} mA`;
+    document.getElementById(`laser_id_${laser_id}_monitor_diode_current`).innerHTML = `Becsült monitor dióda árama: ${current} µA`;
 }

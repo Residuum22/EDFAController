@@ -77,20 +77,20 @@ laser_module_3_report = laser_module_data_report_module_1480(
 
 laser_module_1_set = laser_module_data_set_module_976(
                         report_interval=1, 
-                        laser_976_1={"laser_id": "LD1", "enabled":False, "desired_temperature": 50, "desired_monitor_diode_current": 0}, 
-                        laser_976_2={"laser_id": "LD6", "enabled":False, "desired_temperature": 50, "desired_monitor_diode_current": 0}
+                        laser_976_1={"laser_id": "LD1", "enabled":False, "desired_temperature": 50, "desired_laser_diode_current": 0}, 
+                        laser_976_2={"laser_id": "LD6", "enabled":False, "desired_temperature": 50, "desired_laser_diode_current": 0}
                         )
 
 laser_module_2_set = laser_module_data_set_module_1480(
                         report_interval=1, 
-                        laser_1480_1={"laser_id": "LD2", "enabled":False, "desired_temperature": 50, "desired_monitor_diode_current": 0}, 
-                        laser_1480_2={"laser_id": "LD3", "enabled":False, "desired_temperature": 50, "desired_monitor_diode_current": 0}
+                        laser_1480_1={"laser_id": "LD2", "enabled":False, "desired_temperature": 50, "desired_laser_diode_current": 0}, 
+                        laser_1480_2={"laser_id": "LD3", "enabled":False, "desired_temperature": 50, "desired_laser_diode_current": 0}
                         )
 
 laser_module_3_set = laser_module_data_set_module_1480(
                         report_interval=1, 
-                        laser_1480_1={"laser_id": "LD4", "enabled":False, "desired_temperature": 50, "desired_monitor_diode_current": 0}, 
-                        laser_1480_2={"laser_id": "LD5", "enabled":False, "desired_temperature": 50, "desired_monitor_diode_current": 0}
+                        laser_1480_1={"laser_id": "LD4", "enabled":False, "desired_temperature": 50, "desired_laser_diode_current": 0}, 
+                        laser_1480_2={"laser_id": "LD5", "enabled":False, "desired_temperature": 50, "desired_laser_diode_current": 0}
                         )
 
 voa_module_set = voa_module_data_set(attenuation=0)
@@ -194,9 +194,9 @@ async def set_laser_module_desired_temperature(id: int, desired_temperature: int
         json_data = jsonable_encoder(laser_module_3_set)
         mqtt.publish('/laser_module_set/3', json.dumps(json_data))
       
-@app.post("/set_laser_id_desired_cur/{id}")
+@app.post("/set_laser_id_desired_laser_cur/{id}")
 async def set_laser_id_desired_cur(id: str, current: int):
-    print(f"Laser {id} monitor diode current change to {current} uA")
+    print(f"Laser {id} laser diode current change to {current} mA")
     if id == 'LD1':
         laser_module_1_set.laser_976_1.desired_laser_diode_current = current
         mqtt.publish('/laser_module_set/1', jsonable_encoder(laser_module_1_set))

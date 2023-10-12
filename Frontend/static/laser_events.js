@@ -1,5 +1,5 @@
 const laser_module_desired_temperature_offset = 5;
-const laser_module_desired_monitor_diode_offset = 250;
+const laser_module_desired_laser_diode_offset = 20;
 const HOST = "http://localhost:8000"
 
 /**
@@ -15,7 +15,7 @@ function post_call(path, json_body, callback) {
         }
     };
     xhttp.open("POST", HOST + path, true);
-    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.setRequestHeader("Content-type", "text/plain");
     xhttp.send(JSON.stringify(json_body));
 }
 
@@ -30,8 +30,8 @@ function send_desTemp_backend(laser_id, desTemp) {
 /**
  * Send desired monitor current from the frontend to the backend
  */
-function send_desMonCur_backend(laser_id, desMonCur) {
-    let path = "/set_laser_id_desired_cur/" + laser_id + '?' + 'current=' + desMonCur;
+function send_desLasCur_backend(laser_id, desMonCur) {
+    let path = "/set_laser_id_desired_laser_cur/" + laser_id + '?' + 'current=' + desMonCur;
     post_call_voa(path, null, null);
 }
 
@@ -49,7 +49,7 @@ function send_emerg_stop_backend(laser_id) {
 function enable_disable_laser_id(laser_id) {
     let laser_id_name = `laser_id_${laser_id}_on_off_switch`;
     let state = document.getElementById(laser_id_name).checked;
-    let path = "/enable_disable_laser_id/" + laser_id + "?" + "state="+ state;
+    let path = "/enable_disable_laser_id/" + laser_id + "?" + "state=" + state;
     post_call(path, null, null);
 }
 
@@ -82,32 +82,49 @@ function decrement_laser_desired_temperature(laser_module_id) {
 
 function increment_laser_diode_desired_current(laser_id) {
     let laser_name = "laser_module_" + laser_id + "_laser_diode_desired_current";
-    let current_desired_monitor_diode_current = document.getElementById(laser_name).innerHTML;
-    let current_desired_monitor_diode_current_int = parseInt(current_desired_monitor_diode_current.match(/\d/g).join(""));
+    let current_laser_diode_current = document.getElementById(laser_name).innerHTML;
+    let current_laser_diode_current_int = parseInt(current_laser_diode_current.match(/\d/g).join(""));
 
-    if (current_desired_monitor_diode_current_int < 3000) {
-        current_desired_monitor_diode_current_int = current_desired_monitor_diode_current_int + laser_module_desired_monitor_diode_offset;
-        send_desMonCur_backend(laser_id, current_desired_monitor_diode_current_int)
+
+    if (['LD1', 'LD6'].includes(laser_id)) {
+        if (current_laser_diode_current_int < 380) {
+            current_laser_diode_current_int = current_laser_diode_current_int + laser_module_desired_laser_diode_offset;
+            send_desLasCur_backend(laser_id, current_laser_diode_current_int)
+        }
     }
-    document.getElementById(laser_name).innerHTML = "Kívánt lézer dióda árama: " + current_desired_monitor_diode_current_int + " mA";
+    else {
+        if (current_laser_diode_current_int < 700) {
+            current_laser_diode_current_int = current_laser_diode_current_int + laser_module_desired_laser_diode_offset;
+            send_desLasCur_backend(laser_id, current_laser_diode_current_int)
+        }
+    }
+    document.getElementById(laser_name).innerHTML = "Lézer dióda árama: " + current_laser_diode_current_int + " mA";
 }
 
 function decrement_laser_diode_desired_current(laser_id) {
     let laser_name = "laser_module_" + laser_id + "_laser_diode_desired_current";
     let current_desired_monitor_diode_current = document.getElementById(laser_name).innerHTML;
-    let current_desired_monitor_diode_current_int = parseInt(current_desired_monitor_diode_current.match(/\d/g).join(""));
+    let current_laser_diode_current_int = parseInt(current_desired_monitor_diode_current.match(/\d/g).join(""));
 
-    if (current_desired_monitor_diode_current_int > 0) {
-        current_desired_monitor_diode_current_int = current_desired_monitor_diode_current_int - laser_module_desired_monitor_diode_offset;
-        send_desMonCur_backend(laser_id, current_desired_monitor_diode_current_int)
+    if (['LD1', 'LD6'].includes(laser_id)) {
+        if (current_laser_diode_current_int > 0) {
+            current_laser_diode_current_int = current_laser_diode_current_int - laser_module_desired_laser_diode_offset;
+            send_desLasCur_backend(laser_id, current_laser_diode_current_int)
+        }
     }
-    document.getElementById(laser_name).innerHTML = "Kívánt lézer dióda árama: " + current_desired_monitor_diode_current_int + " mA";
+    else {
+        if (current_laser_diode_current_int > 0) {
+            current_laser_diode_current_int = current_laser_diode_current_int - laser_module_desired_laser_diode_offset;
+            send_desLasCur_backend(laser_id, current_laser_diode_current_int)
+        }
+    }
+    document.getElementById(laser_name).innerHTML = "Lézer dióda árama: " + current_laser_diode_current_int + " mA";
 }
 
 function laser_emergency_stop(laser_id) {
     laser_id.forEach(element => {
         let laser_name = "laser_module_" + element + "_laser_diode_desired_current";
-        document.getElementById(laser_name).innerHTML = "Kívánt lézer dióda árama: 0 mA";
+        document.getElementById(laser_name).innerHTML = "Lézer dióda árama: 0 mA";
 
         laser_name = "laser_id_" + element + "_on_off_switch";
         document.getElementById(laser_name).checked = 0;

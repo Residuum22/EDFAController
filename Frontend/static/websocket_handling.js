@@ -16,9 +16,6 @@ Socket.onmessage = function (evt) {
             update_laser_id_temp(json_msg['laser_976_1']['laser_id'], json_msg['laser_976_1']['temperature'])
             update_laser_id_temp(json_msg['laser_976_2']['laser_id'], json_msg['laser_976_2']['temperature'])
 
-            update_laser_id_laser_current(json_msg['laser_976_1']['laser_id'], json_msg['laser_976_1']['laser_current'])
-            update_laser_id_laser_current(json_msg['laser_976_2']['laser_id'], json_msg['laser_976_2']['laser_current'])
-
             update_laser_id_monitor_diode_current(json_msg['laser_976_1']['laser_id'], json_msg['laser_976_1']['monitor_diode_current'])
             update_laser_id_monitor_diode_current(json_msg['laser_976_2']['laser_id'], json_msg['laser_976_2']['monitor_diode_current'])
             break;
@@ -27,9 +24,6 @@ Socket.onmessage = function (evt) {
         case 3:
             update_laser_id_temp(json_msg['laser_1480_1']['laser_id'], json_msg['laser_1480_1']['temperature'])
             update_laser_id_temp(json_msg['laser_1480_2']['laser_id'], json_msg['laser_1480_2']['temperature'])
-
-            update_laser_id_laser_current(json_msg['laser_1480_1']['laser_id'], json_msg['laser_1480_1']['laser_current'])
-            update_laser_id_laser_current(json_msg['laser_1480_2']['laser_id'], json_msg['laser_1480_2']['laser_current'])
 
             update_laser_id_monitor_diode_current(json_msg['laser_1480_1']['laser_id'], json_msg['laser_1480_1']['monitor_diode_current'])
             update_laser_id_monitor_diode_current(json_msg['laser_1480_2']['laser_id'], json_msg['laser_1480_2']['monitor_diode_current'])

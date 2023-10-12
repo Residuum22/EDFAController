@@ -9,7 +9,7 @@ function post_call_voa(path, json_body, callback) {
         }
     };
     xhttp.open("POST", HOST + path, true);
-    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.setRequestHeader("Content-type", "text/plain");
     xhttp.send(JSON.stringify(json_body));
 }
 

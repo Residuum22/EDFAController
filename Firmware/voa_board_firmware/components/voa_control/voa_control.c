@@ -72,8 +72,10 @@ typedef enum voa_mcpwm_group_id
 
 // MCPWM generator handlers
 // Concept: One group for forward and one group for reverse
-static mcpwm_gen_handle_t fwd_generators[2];
-static mcpwm_gen_handle_t rev_generators[2];
+//          Each group has three opeator and each contains two generators.
+//          4 gen needed.
+static mcpwm_gen_handle_t fwd_generators[4];
+static mcpwm_gen_handle_t rev_generators[4];
 
 // ADC1 oneshot configuration
 // static adc_cali_handle_t adc1_cali_handle = NULL;
@@ -111,18 +113,74 @@ static TimerHandle_t sw_timer;
  * @param genb Generator B (second generator handler of the configurated MCPWM)
  * @param comp Comparator (comparator handler for the configured MCPWM)
  */
-static void gen_action_config(mcpwm_gen_handle_t gena, mcpwm_gen_handle_t genb, mcpwm_cmpr_handle_t comp)
+static void fwd_gen_action_config(mcpwm_gen_handle_t *gens, mcpwm_cmpr_handle_t *cmps)
 {
+    // Gen 0 and 1 timer evernt based, gen2 and gen3 comparator event based.
     ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_timer_event(
-        gena,
+        gens[0],
         MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, MCPWM_TIMER_EVENT_EMPTY, MCPWM_GEN_ACTION_HIGH),
         MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, MCPWM_TIMER_EVENT_FULL, MCPWM_GEN_ACTION_LOW),
         MCPWM_GEN_TIMER_EVENT_ACTION_END()));
 
+    // Complementar of the first
+    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_timer_event(
+        gens[1],
+        MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, MCPWM_TIMER_EVENT_EMPTY, MCPWM_GEN_ACTION_LOW),
+        MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, MCPWM_TIMER_EVENT_FULL, MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_TIMER_EVENT_ACTION_END()));
+
+    // B coil
     ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_compare_event(
-        genb,
-        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, comp, MCPWM_GEN_ACTION_LOW),
-        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, comp, MCPWM_GEN_ACTION_HIGH),
+        gens[2],
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, cmps[0], MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, cmps[0], MCPWM_GEN_ACTION_LOW),
+        MCPWM_GEN_COMPARE_EVENT_ACTION_END()));
+
+    //
+    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_compare_event(
+        gens[3],
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, cmps[1], MCPWM_GEN_ACTION_LOW),
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, cmps[1], MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_COMPARE_EVENT_ACTION_END()));
+}
+
+
+/**
+ * @brief This fuction is setting up the MCPWM periheral comparators. According to this code
+ * the MCPWM pheripheral can make two square signal, which phases are shifted with 90 degree.
+ *
+ * @param gena Generator A (first generator handler of the configurated MCPWM)
+ * @param genb Generator B (second generator handler of the configurated MCPWM)
+ * @param comp Comparator (comparator handler for the configured MCPWM)
+ */
+static void rev_gen_action_config(mcpwm_gen_handle_t *gens, mcpwm_cmpr_handle_t *cmps)
+{
+    // Gen 0 and 1 timer evernt based, gen2 and gen3 comparator event based.
+    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_timer_event(
+        gens[0],
+        MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, MCPWM_TIMER_EVENT_EMPTY, MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, MCPWM_TIMER_EVENT_FULL, MCPWM_GEN_ACTION_LOW),
+        MCPWM_GEN_TIMER_EVENT_ACTION_END()));
+
+    // Complementar of the first
+    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_timer_event(
+        gens[1],
+        MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, MCPWM_TIMER_EVENT_EMPTY, MCPWM_GEN_ACTION_LOW),
+        MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, MCPWM_TIMER_EVENT_FULL, MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_TIMER_EVENT_ACTION_END()));
+
+    // B coil this need to be different from the forward. (Only the low or high part.)
+    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_compare_event(
+        gens[2],
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, cmps[0], MCPWM_GEN_ACTION_LOW),
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, cmps[0], MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_COMPARE_EVENT_ACTION_END()));
+
+    //
+    ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_compare_event(
+        gens[3],
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, cmps[1], MCPWM_GEN_ACTION_HIGH),
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_DOWN, cmps[1], MCPWM_GEN_ACTION_LOW),
         MCPWM_GEN_COMPARE_EVENT_ACTION_END()));
 }
 
@@ -194,7 +252,7 @@ static void connect_timer_operator(uint8_t mcpwm_group_id, mcpwm_timer_handle_t 
  * @param operators MCPWM operator handler
  * @param comparator MCPWM comprator handler
  */
-static void comparator_init(uint8_t mcpwm_group_id, mcpwm_oper_handle_t *operators, mcpwm_cmpr_handle_t *comparator)
+static void comparator_init(uint8_t mcpwm_group_id, mcpwm_oper_handle_t *operators, mcpwm_cmpr_handle_t *comparators)
 {
     ESP_LOGI(TAG, "Create comparator for second operator for group %d", mcpwm_group_id);
     // Configuration to use comparator with the overflow and underflow signals. Software sync disable.
@@ -205,10 +263,13 @@ static void comparator_init(uint8_t mcpwm_group_id, mcpwm_oper_handle_t *operato
     };
 
     // Create comparator in the operator
-    ESP_ERROR_CHECK(mcpwm_new_comparator(operators[1], &compare_config, comparator));
-    ESP_LOGI(TAG, "Set comparator value: %d", COMPARE_VALUE);
-    // Set the comparator value. (More details in the brief)
-    ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(*comparator, COMPARE_VALUE));
+    for (uint8_t i = 0; i < 2; i++)
+    {
+        ESP_ERROR_CHECK(mcpwm_new_comparator(operators[i], &compare_config, &comparators[i]));
+        ESP_LOGI(TAG, "Set comparator value: %d", COMPARE_VALUE);
+        // Set the comparator value. (More details in the brief)
+        ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparators[i], COMPARE_VALUE));
+    }
 }
 
 /**
@@ -221,14 +282,17 @@ static void comparator_init(uint8_t mcpwm_group_id, mcpwm_oper_handle_t *operato
  * @param gen_gpio GPIO output instance, where the signal will be represented
  * @param comparator Comparator handler
  */
-static void generator_init(uint8_t mcpwm_group_id, mcpwm_oper_handle_t *operators, mcpwm_gen_handle_t *generators, const uint8_t *gen_gpio, mcpwm_cmpr_handle_t comparator)
+static void generator_init(uint8_t mcpwm_group_id, mcpwm_oper_handle_t *operators, mcpwm_gen_handle_t *generators, const uint8_t *gen_gpio)
 {
     ESP_LOGI(TAG, "Create generators for group %d", mcpwm_group_id);
     mcpwm_generator_config_t gen_config = {};
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 4; i++)
     {
+        // Quick info:
+        // 2 operator pointer, four pin number, four generators 
+        // 2 generator in the first operator, two generator in the second.
         gen_config.gen_gpio_num = gen_gpio[i];
-        ESP_ERROR_CHECK(mcpwm_new_generator(operators[i], &gen_config, &generators[i]));
+        ESP_ERROR_CHECK(mcpwm_new_generator(operators[i % 2], &gen_config, &generators[i]));
     }
 }
 
@@ -340,16 +404,16 @@ void voa_control_init_fwd()
 
     connect_timer_operator(VOA_MCPWM_GROUP_0, timer, operators);
 
-    mcpwm_cmpr_handle_t comparator;
-    comparator_init(VOA_MCPWM_GROUP_0, operators, &comparator);
+    mcpwm_cmpr_handle_t comparators[2];
+    comparator_init(VOA_MCPWM_GROUP_0, operators, comparators);
 
-    const uint8_t gen_gpios[2] = {VOA_FWD_A_PIN, VOA_FWD_B_PIN};
-    generator_init(VOA_MCPWM_GROUP_0, operators, fwd_generators, gen_gpios, comparator);
+    const uint8_t gen_gpios[4] = {VOA_FWD_A_PIN, VOA_REV_A_PIN, VOA_FWD_B_PIN, VOA_REV_B_PIN};
+    generator_init(VOA_MCPWM_GROUP_0, operators, fwd_generators, gen_gpios);
 
     voa_control_disable_fwd();
 
     ESP_LOGI(TAG, "Set generator actions on timer and compare event");
-    gen_action_config(fwd_generators[0], fwd_generators[1], comparator);
+    fwd_gen_action_config(fwd_generators, comparators);
 
     start_timer(VOA_MCPWM_GROUP_0, timer);
 }
@@ -364,16 +428,16 @@ void voa_control_init_rev()
 
     connect_timer_operator(VOA_MCPWM_GROUP_1, timer, operators);
 
-    mcpwm_cmpr_handle_t comparator;
-    comparator_init(VOA_MCPWM_GROUP_1, operators, &comparator);
+    mcpwm_cmpr_handle_t comparators[2];
+    comparator_init(VOA_MCPWM_GROUP_1, operators, comparators);
 
-    const uint8_t gen_gpios[2] = {VOA_REV_A_PIN, VOA_REV_B_PIN};
-    generator_init(VOA_MCPWM_GROUP_1, operators, rev_generators, gen_gpios, comparator);
+    const uint8_t gen_gpios[4] = {VOA_FWD_A_PIN, VOA_REV_A_PIN, VOA_FWD_B_PIN, VOA_REV_B_PIN};
+    generator_init(VOA_MCPWM_GROUP_1, operators, rev_generators, gen_gpios);
 
     voa_control_disable_rev();
 
     ESP_LOGI(TAG, "Set generator actions on timer and compare event");
-    gen_action_config(rev_generators[0], rev_generators[1], comparator);
+    rev_gen_action_config(rev_generators, comparators);
 
     start_timer(VOA_MCPWM_GROUP_1, timer);
 }
@@ -381,7 +445,7 @@ void voa_control_init_rev()
 void voa_control_enable_fwd()
 {
     ESP_LOGI(TAG, "Enable output for forward VOA");
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 4; ++i)
     {
         // remove the force level on the generator, so that we can see the PWM again
         ESP_ERROR_CHECK(mcpwm_generator_set_force_level(fwd_generators[i], -1, true));
@@ -391,7 +455,7 @@ void voa_control_enable_fwd()
 void voa_control_enable_rev()
 {
     ESP_LOGI(TAG, "Enable output for reverse VOA");
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 4; ++i)
     {
         // remove the force level on the generator, so that we can see the PWM again
         ESP_ERROR_CHECK(mcpwm_generator_set_force_level(rev_generators[i], -1, true));
@@ -401,7 +465,7 @@ void voa_control_enable_rev()
 void voa_control_disable_fwd()
 {
     ESP_LOGI(TAG, "Disable output for forward VOA");
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 4; i++)
     {
         ESP_ERROR_CHECK(mcpwm_generator_set_force_level(fwd_generators[i], 0, true));
     }
@@ -410,7 +474,7 @@ void voa_control_disable_fwd()
 void voa_control_disable_rev()
 {
     ESP_LOGI(TAG, "Disable output for reverse VOA");
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 4; i++)
     {
         ESP_ERROR_CHECK(mcpwm_generator_set_force_level(rev_generators[i], 0, true));
     }
@@ -468,7 +532,7 @@ void voa_control_set_attenuation_max()
     // Start to decrease attenuation
     voa_stopped = false;
     voa_control_enable_fwd();
-    voa_control_disable_rev();
+    //voa_control_disable_rev();
 
     // Start timer
     // Before timer start current_adc_value need to be cleared

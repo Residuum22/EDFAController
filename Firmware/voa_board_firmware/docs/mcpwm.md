@@ -42,6 +42,12 @@ Forward and reverse mode can't be in one MCPWM group because:
 - Two operator needed because of the two independent coils of the stepper motor. 
 - Three operator are available in one MCPWM group and two are allocated for forward mode and the left one is not enough for reverse.
 
+## Issue during development
+
+With two MCPWM group (one for reverse and one for forwards) when rooted in the same output pins only one will work.
+
+-> Solution: On direction change the group need to be deinitialized and reinitialize.
+
 \+ Information: Only one timer is enough because in this case no timer syncronisation is needed.
 
 ### Forward matrix

@@ -6,37 +6,19 @@
  * More details can be found in the ESP-IDF documentation.
  * 
  */
-void voa_control_init_fwd();
-
-/**
- * @brief This function initialize the VOA driver in reverse direction.
- * 
- */
-void voa_control_init_rev();
+void voa_control_init();
 
 /**
  * @brief This function enable the output signals in forward direction.
  * 
  */
-void voa_control_enable_fwd();
-
-/**
- * @brief This function enable the output signals in reverse direction.
- * 
- */
-void voa_control_enable_rev();
+void voa_control_enable_output();
 
 /**
  * @brief This function disable the ouput signals in forward direction.
  * 
  */
-void voa_control_disable_fwd();
-
-/**
- * @brief This function disable the output signals in reverse direction.
- * 
- */
-void voa_control_disable_rev();
+void voa_control_disable_output();
 
 /**
  * @brief This function initialize the ADC1 pheripheral in oneshot mode.

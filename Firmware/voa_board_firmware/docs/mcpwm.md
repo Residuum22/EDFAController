@@ -46,22 +46,24 @@ Forward and reverse mode can't be in one MCPWM group because:
 
 With two MCPWM group (one for reverse and one for forwards) when rooted in the same output pins only one will work.
 
--> Solution: On direction change the group need to be deinitialized and reinitialize.
+-> Solution: On direction change the generators need to be deinitialized and reinitialize.
 
 \+ Information: Only one timer is enough because in this case no timer syncronisation is needed.
 
 ### Forward matrix
 
-A+|A-|B+|B-|
-1|0|1|0| 
-0|1|1|0| 
-0|1|0|1| 
-1|0|0|1| 
+|A+|A-|B+|B-|
+|--|--|--|--|
+| 1| 0| 1| 0| 
+| 0| 1| 1| 0| 
+| 0| 1| 0| 1| 
+| 1| 0| 0| 1| 
 
 ### Reverse matrix
 
-A+|A-|B+|B-|
-1|0|0|1| 
-0|1|0|1| 
-0|1|1|0| 
-1|0|1|0| 
+|A+|A-|B+|B-|
+|--|--|--|--|
+| 1| 0| 0| 1| 
+| 0| 1| 0| 1| 
+| 0| 1| 1| 0| 
+| 1| 0| 1| 0| 

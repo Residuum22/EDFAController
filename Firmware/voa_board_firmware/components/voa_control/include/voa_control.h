@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @brief This function initialize the VOA driver in forward direction.
+ * @brief This function initialize the VOA driver base (timer, operators, comparators).
  * The function is initialize MCPWM pheripheral in the right order.
  * More details can be found in the ESP-IDF documentation.
  * 
@@ -9,13 +9,13 @@
 void voa_control_init();
 
 /**
- * @brief This function enable the output signals in forward direction.
+ * @brief This function enable the output signals.
  * 
  */
 void voa_control_enable_output();
 
 /**
- * @brief This function disable the ouput signals in forward direction.
+ * @brief This function disable the ouput signals.
  * 
  */
 void voa_control_disable_output();

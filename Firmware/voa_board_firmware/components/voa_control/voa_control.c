@@ -32,12 +32,10 @@ static const char *TAG = "VOA_CONTROL";
 #define COMPARE_VALUE       (TIMER_PERIOD / 4)  // Because square signal and up, down counter timer
 
 // https://www.calculator.net/slope-calculator.html
-#define SLOPE                       122.85
-#define CONVERT_DB_TO_VOLTAGE(x)    (x * SLOPE + voa_max_adc_value)
-#define CONVERT_DB_TO_VALUE(x)      (x * SLOPE + voa_min_adc_value)
+#define SLOPE                  100
+#define CONVERT_DB_TO_MV(x)    (x * SLOPE + voa_min_voltage)
 
 // This should be a low value
-// TODO: need to find the good value
 // If it is low, the noise can trigger the end values
 // If it is to high, the motor cant be set into the correct position
 #if CONFIG_USE_EPS_VAR
@@ -45,8 +43,6 @@ int adc_position_eps;
 #else
 #define ADC_POSITION_EPS 20
 #endif
-
-#define ADC_STUCKED_EPS 2 * ADC_POSITION_EPS
 
 #define TIMER_CHECK_INTERVALL 1000
 //*****************************************************************************
@@ -80,20 +76,21 @@ static mcpwm_cmpr_handle_t comparators[2];
 
 
 // ADC1 oneshot configuration
-// static adc_cali_handle_t adc1_cali_handle = NULL;
-static bool do_calibration1;
+static adc_cali_handle_t adc1_cali_handle = NULL;
 static adc_oneshot_unit_handle_t adc1_handle;
 
-// Automatic end position mapper variables
-static int voa_max_adc_value = 4095;
-static int voa_min_adc_value = 0;
-static bool voa_stopped = false;
-static bool voa_stucked = false;
-
-static int current_adc_value = 0;
 
 // Automatic end position mapper software timer handler
 static TimerHandle_t sw_timer;
+
+// Automatic end position mapper variables
+static int voa_max_voltage;
+static int voa_min_voltage;
+static bool voa_stopped = false;
+
+// General use for the ADC
+static int current_adc_voltage = 0;
+static int last_adc_voltage = 0;
 
 //*****************************************************************************
 // Private variables and structs END
@@ -110,10 +107,13 @@ static TimerHandle_t sw_timer;
 /**
  * @brief This function configures stepper motor coilA PWM signal.
  * The current in the coils need to be inverted every new cycle.
+ * Don't use this function directly.
  * 
- * @param gens Generator for the coilA. (should gen0 and gen1) 
+ * @param gens Generator for the coilA. (should gen0 and gen1) use 
+ * generators variable here because of the array indexing.
+ *  
  */
-static void coilA_generator_action_config(mcpwm_gen_handle_t *gens)
+static void _coilA_generator_action_config(mcpwm_gen_handle_t *gens)
 {
     ESP_ERROR_CHECK(mcpwm_generator_set_actions_on_timer_event(
         gens[0],
@@ -130,9 +130,10 @@ static void coilA_generator_action_config(mcpwm_gen_handle_t *gens)
 
 /**
  * @brief This function creates the coilB signals. In forward mode the the current need to
- * be delayed with 90 degree. Check /docs for the documentation.
+ * be delayed with 90 degree. Check /docs/mcpwm.md for the documentation.
+ * Don't use this function directly.
  * 
- * @param gens Generator for the coilB
+ * @param gens Generator for the coilB (use generators[4] because of the indexing)
  * @param cmps Comparator for the coilB
  */
 static void _coilB_fwd_generator_action_config(mcpwm_gen_handle_t *gens, mcpwm_cmpr_handle_t *cmps)
@@ -152,9 +153,10 @@ static void _coilB_fwd_generator_action_config(mcpwm_gen_handle_t *gens, mcpwm_c
 
 /**
  * @brief This function creates the coilB signals. In forward mode the the current need to
- * be forward with 90 degree. Check /docs for the documentation.
+ * be forward with 90 degree. Check /docs/mcpwm.md for the documentation.
+ * Don't use this function directly.
  * 
- * @param gens Generator for the coilB
+ * @param gens Generator for the coilB (use generators[4] because of the indexing)
  * @param cmps Comparator for the coilB
  */
 static void _coilB_rev_generator_action_config(mcpwm_gen_handle_t *gens, mcpwm_cmpr_handle_t *cmps)
@@ -172,13 +174,23 @@ static void _coilB_rev_generator_action_config(mcpwm_gen_handle_t *gens, mcpwm_c
         MCPWM_GEN_COMPARE_EVENT_ACTION_END()));
 }
 
-static void set_voa_forward_mode(void)
+/**
+ * @brief This function will set the VOA motor into forward mode.
+ *
+ */
+static void set_voa_forward_mode()
 {
+    _coilA_generator_action_config(generators);
     _coilB_fwd_generator_action_config(generators, comparators);
 }
 
-static void set_voa_reverse_mode(void)
+/**
+ * @brief This function will set the VOA motor into reverse moce.
+ * 
+ */
+static void set_voa_reverse_mode()
 {
+    _coilA_generator_action_config(generators);
     _coilB_rev_generator_action_config(generators, comparators);
 }
 
@@ -245,6 +257,7 @@ static void _connect_timer_operator(uint8_t mcpwm_group_id, mcpwm_timer_handle_t
  * UP and DOWN counter. The timer compare config is tez and tep, so if the timer over/under flow
  * everything is starting again. The compare value must be set between the increment/decrement slope.
  * Because we need a symmetric square wave (50% duty), the compare value must be set in the FREQ/4 positions.
+ * See /docs/mcpwm.md
  *
  * @param mcpwm_group_id Group ID - Only for ESP_LOG
  * @param operators MCPWM operator handler
@@ -332,15 +345,15 @@ static void inline voa_adc_gpio_init()
  * If the value is between in a range of EPSILON (this is a small number), measured in
  * value of the ADC this number is between 5-30.
  *
- * @param current_value Current ADC value
- * @param last_value Last stored ADC value
+ * @param current_voltage Current ADC value
+ * @param last_voltage Last stored ADC value
  * @return true If the voa pot is chaging without the eps value.
  * @return false If the voa pot is NOT changing within the eps value.
  */
-static bool voa_control_is_moving(int current_value, int last_value)
+static bool voa_control_is_moving(int current_voltage, int last_voltage)
 {
     ESP_LOGI(TAG, "Checking VOA position values");
-    int difference = abs(last_value - current_value);
+    int difference = abs(last_voltage - current_voltage);
 
 #if CONFIG_USE_EPS_VAR
     if (difference <= adc_position_eps)
@@ -348,17 +361,16 @@ static bool voa_control_is_moving(int current_value, int last_value)
     if (difference <= ADC_POSITION_EPS)
 #endif
     {
-        ESP_LOGI(TAG, "[WARNING] VOA value is not changing... Current ADC measurement: %d", current_value);
+        ESP_LOGI(TAG, "[WARNING] VOA value is not changing... Current ADC measurement: %d", current_voltage);
         return false;
     }
     else
     {
-        ESP_LOGI(TAG, "VOA value is changing... Current ADC measurement: %d", current_value);
+        ESP_LOGI(TAG, "VOA value is changing... Current ADC measurement: %d", current_voltage);
         return true;
     }
 }
 
-static int last_adc_value = 0;
 /**
  * @brief This function is saving the last ADC value and checking if the
  * voa is stopped or reached the end position. This function can be called as
@@ -370,23 +382,18 @@ static int last_adc_value = 0;
  */
 static void voa_control_check_if_stopped(TimerHandle_t xTimer)
 {
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &current_adc_value));
+    int adc_tmp;
 
-    if (!voa_control_is_moving(current_adc_value, last_adc_value))
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_tmp));
+    ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_tmp, &current_adc_voltage));
+
+    if (!voa_control_is_moving(current_adc_voltage, last_adc_voltage))
     {
         // Emergency shutdown
         voa_control_disable_output();
         voa_stopped = true;
-
-        // // If VOA stopped in the middle of min and max then it stucked so 
-        // int min_diff = abs(current_adc_value - voa_min_adc_value);
-        // int max_diff = abs(current_adc_value - voa_max_adc_value);
-        // if (min_diff >= ADC_STUCKED_EPS || max_diff >= ADC_STUCKED_EPS)
-        // {
-        //     voa_stucked = true;
-        // }
     }
-    last_adc_value = current_adc_value;
+    last_adc_voltage = current_adc_voltage;
 }
 //*****************************************************************************
 // Static functions END
@@ -440,18 +447,26 @@ void voa_control_adc_init()
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
 
     //-------------ADC2 Calibration Init---------------//
-    do_calibration1 = false;
+    adc_cali_line_fitting_config_t cali_config = {
+        .unit_id = ADC_UNIT_1,
+        .atten = ADC_ATTEN_DB_11,
+        .bitwidth = ADC_BITWIDTH_13,
+    };
+    ESP_ERROR_CHECK(adc_cali_create_scheme_line_fitting(&cali_config, &adc1_cali_handle));
 
     //-------------ADC2 Config---------------//
     adc_oneshot_chan_cfg_t config = {
-        .bitwidth = ADC_BITWIDTH_DEFAULT,
-        .atten = ADC_ATTEN_DB_11,
+        .bitwidth = ADC_BITWIDTH_13,
+        .atten = ADC_ATTEN_DB_11, // Need to measure maximum 2.4V 
     };
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_0, &config));
 }
 
 void voa_control_set_attenuation_zero()
 {
+    // Temporary value to read voa before converting it into mV
+    int voa_adc_value;
+
     // Start to decrease attenuation
     voa_stopped = false;
 
@@ -465,7 +480,7 @@ void voa_control_set_attenuation_zero()
 
     // Start timer
     // Before timer start current_adc_value need to be cleared
-    current_adc_value = 0;
+    current_adc_voltage = 0;
     xTimerStart(sw_timer, 0);
 
     // Global variable for communication the timer will set this true
@@ -480,12 +495,17 @@ void voa_control_set_attenuation_zero()
     xTimerStop(sw_timer, 0);
 
     // Store min value
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &voa_min_adc_value));
-    ESP_LOGI(TAG, "[VOA_MIN_VALUE]: %d", voa_min_adc_value);
+
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &voa_adc_value));
+    ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, voa_adc_value, &voa_min_voltage));
+    ESP_LOGI(TAG, "[VOA_MIN_VOLTAGE]: %d", voa_min_voltage);
 }
 
 void voa_control_set_attenuation_max()
 {
+    // Temporary value to read voa before converting it into mV
+    int voa_adc_value;
+
     // Start to decrease attenuation
     voa_stopped = false;
 
@@ -499,7 +519,7 @@ void voa_control_set_attenuation_max()
 
     // Start timer
     // Before timer start current_adc_value need to be cleared
-    current_adc_value = 0;
+    current_adc_voltage = 0;
     xTimerStart(sw_timer, 0);
 
     // This value is modified with the timer handler function namely voa_control_check_if_stopped
@@ -513,14 +533,16 @@ void voa_control_set_attenuation_max()
     xTimerStop(sw_timer, 0);
 
     // Store min value
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &voa_max_adc_value));
-    ESP_LOGI(TAG, "[VOA_MAX_VALUE]: %d", voa_max_adc_value);
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &voa_adc_value));
+    ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, voa_adc_value, &voa_max_voltage));
+    ESP_LOGI(TAG, "[VOA_MIN_VOLTAGE]: %d", voa_max_voltage);
 }
 
 void voa_control_task(void *pvParameters)
 {
     uint8_t attenuation = 0;
     int adc_value = 0;
+    int adc_voltage = 0;
 
     voa_control_init();
 
@@ -531,9 +553,6 @@ void voa_control_task(void *pvParameters)
     // Init timer for error/end position ending
     sw_timer = xTimerCreate("VOA Timer", pdMS_TO_TICKS(TIMER_CHECK_INTERVALL), pdTRUE, (void *)1, &voa_control_check_if_stopped);
 
-    // CoilA control is static never will change 
-    coilA_generator_action_config(generators);
-
     // Map min and max value of the voa.
     voa_control_set_attenuation_max();
     voa_control_set_attenuation_zero();
@@ -541,39 +560,41 @@ void voa_control_task(void *pvParameters)
     for (;;)
     {   
         xQueueReceive(voa_attenuation_queue, &attenuation, portMAX_DELAY);
-        int espected_raw = CONVERT_DB_TO_VALUE(attenuation);
-        ESP_LOGI(TAG, "Attenuation in raw value: %d", espected_raw);
+        int expected_mv = CONVERT_DB_TO_MV(attenuation);
+        ESP_LOGI(TAG, "Attenuation in mV: %d", expected_mv);
 
         // Check if the attenuation is greater than the maximum value
-        if (espected_raw > voa_max_adc_value)
+        if (expected_mv > voa_max_voltage)
         {
-            espected_raw = voa_max_adc_value;
+            expected_mv = voa_max_voltage;
         }
         // Check if the attenuation is less than the minimum value
-        else if (espected_raw < voa_min_adc_value)
+        else if (expected_mv < voa_max_voltage)
         {
-            espected_raw = voa_min_adc_value;
+            expected_mv = voa_max_voltage;
         }
 
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
-        ESP_LOGI(TAG, "Current ADC value: %d | Expected RAW: %d", adc_value, espected_raw);
+        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_value, &adc_voltage));
+        ESP_LOGI(TAG, "Current ADC voltage: %d mV | Expected voltage: %d mV", adc_voltage, expected_mv);
         // Before timer start current_adc_value need to be cleared
-        current_adc_value = 0;
+        current_adc_voltage = 0;
         voa_stopped = false;
         xTimerStart(sw_timer, 0);
 
-        if (adc_value < espected_raw)
+        if (adc_voltage < expected_mv)
         {
             ESP_LOGI(TAG, "Move forward...");
             // if the initial state of the VOA pot is less then the expected -> move forward
             set_voa_forward_mode();
             voa_control_enable_output();
 
-            while (adc_value < espected_raw && !voa_stopped)
+            while (adc_voltage < expected_mv && !voa_stopped)
             {
                 vTaskDelay(10);
                 // Wait here until the last value is updated
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+                ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_value, &adc_voltage));
             }
         }
         else
@@ -583,25 +604,17 @@ void voa_control_task(void *pvParameters)
             set_voa_reverse_mode();
             voa_control_enable_output();
 
-            while (adc_value > espected_raw && !voa_stopped)
+            while (adc_voltage > expected_mv && !voa_stopped)
             {
                 vTaskDelay(10);
                 // Wait here until the last value is updated
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &adc_value));
+                ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_value, &adc_voltage));
             }
-        }
-
-        if (voa_stucked)
-        {
-            xTimerStop(sw_timer, 0);
-            voa_indicator_set_error(BLINK_CONNECTED);
-            ESP_LOGE(TAG, "!!!VOA Stucked!!! Check error and reset board!");
-            // FIXME: Implement better error handling
-            assert(false);
         }
 
         xTimerStop(sw_timer, 0);
         voa_control_disable_output();
-        ESP_LOGI(TAG, "Current ADC value: %d | Expected RAW: %d", adc_value, espected_raw);
+        ESP_LOGI(TAG, "Current ADC voltage: %d mV | Expected voltage: %d mV", adc_voltage, expected_mv);
     }
 }

@@ -290,7 +290,7 @@ void peltier_control_task(void *pvParameters)
 
         peltier1_current_temp = laser_module_adc_read_temp1();
         peltier2_current_temp = laser_module_adc_read_temp2();
-        // ESP_LOGI(TAG, "Laser1 temp: %d | Laser2 temp: %d", peltier1_current_temp, peltier2_current_temp);
+        ESP_LOGI(TAG, "Laser1 temp: %d | Laser2 temp: %d", peltier1_current_temp, peltier2_current_temp);
 
         // FIXME: PID controll instead of bang bang controller
         peltier1_diff = peltier1_current_temp - peltier1_desired_temp;

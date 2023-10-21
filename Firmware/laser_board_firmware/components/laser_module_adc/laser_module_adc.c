@@ -27,7 +27,7 @@ static uint32_t convert_raw_to_temp(uint32_t value)
     // float temperature_float = value * 0.030978934324659 - 35;
 
     // Calculated with my Excel sheet
-    float temperature_float = 5.9991 * exp(0.0007 * value);
+    float temperature_float = 5.9991 * exp(0.0007 * value) + 15;
     return (uint32_t)floor(temperature_float);
 }
 

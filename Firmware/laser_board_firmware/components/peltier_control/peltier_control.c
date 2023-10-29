@@ -10,7 +10,11 @@
 
 #include "laser_module_adc.h"
 
+#include "pid_controller.h"
+
 static const char *TAG = "PELTIER_CONTROL";
+
+#define USE_PID_CONTROLLER 1
 
 //*****************************************************************************
 // Defines START
@@ -278,10 +282,27 @@ void peltier_control_task(void *pvParameters)
     uint32_t peltier1_current_temp;
     uint32_t peltier2_current_temp;
 
-    int32_t peltier1_diff, peltier2_diff;
 
     peltier_control_init_cooling();
     peltier_control_enable_cooling();
+
+#if USE_PID_CONTROLLER
+    pid_controller_t peltier_pid = {
+        .Kp = 0.1,
+        .Kd = 0.1,
+        .Ki = 0.1,
+        .tau = 0.02,
+        .limitMin = COMPARE_VALUE_MIN,
+        .limitMax = COMPARE_VALUE_MAX,
+        .limitIntMin = 0,
+        .limitIntMax = COMPARE_VALUE_MAX / 2,
+        .sampleTime = 1 // 1 second
+    };
+
+    pid_controller_init(&peltier_pid);
+#else
+    int32_t peltier1_diff, peltier2_diff;
+#endif
 
     for (;;)
     {
@@ -292,7 +313,15 @@ void peltier_control_task(void *pvParameters)
         peltier2_current_temp = laser_module_adc_read_temp2();
         ESP_LOGI(TAG, "Laser1 temp: %d | Laser2 temp: %d", peltier1_current_temp, peltier2_current_temp);
 
-        // FIXME: PID controll instead of bang bang controller
+#if USE_PID_CONTROLLER
+        pid_controller_update(&peltier_pid, peltier1_desired_temp, peltier1_current_temp);
+        comparator_set_compare_value(comparator1, peltier_pid.output);
+
+        pid_controller_update(&peltier_pid, peltier2_desired_temp, peltier2_current_temp);
+        comparator_set_compare_value(comparator2, peltier_pid.output);
+
+        vTaskDelay(pdMS_TO_TICKS(900)); // Wait ~1 sec
+#else
         peltier1_diff = peltier1_current_temp - peltier1_desired_temp;
         peltier2_diff = peltier2_current_temp - peltier2_desired_temp;
 
@@ -314,5 +343,6 @@ void peltier_control_task(void *pvParameters)
             comparator_set_compare_value(comparator2, COMPARE_VALUE_MIN);
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
+#endif
     }
 }

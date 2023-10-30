@@ -8,6 +8,8 @@
 #include "esp_log.h"
 #include "laser_module_dac.h"
 
+#include "laser_module_adc.h"
+
 static const char *TAG = "LASER_CONTROL";
 
 extern QueueHandle_t laser1_enable_queue, laser2_enable_queue;
@@ -29,7 +31,11 @@ void laser_control_task(void *pvParameters)
         xQueueReceive(laser1_desired_current_queue, &laser1_current, pdMS_TO_TICKS(10));
         xQueueReceive(laser2_desired_current_queue, &laser2_current, pdMS_TO_TICKS(10));
 
-        // TODO: Control Loop insert here insted of setting
+        uint32_t laser1_md = laser_module_adc_read_laser1_monitor_diode();
+        uint32_t laser2_md = laser_module_adc_read_laser2_monitor_diode();
+
+        ESP_LOGI(TAG, "Laser1 monitor diode: %d mV | Laser2 monitor diode: %d mV", laser1_md, laser2_md);
+
         if (laser1_enable)
         {
             ESP_LOGI(TAG, "Laser1 current: %d", laser1_current);

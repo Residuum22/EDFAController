@@ -451,7 +451,7 @@
   (symbol (lib_id "Device:R") (at 175.26 93.345 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 36fa3b52-3974-49da-a672-80f2b42aa3ed)
-    (property "Reference" "R6" (at 177.8 92.0749 0)
+    (property "Reference" "R7" (at 177.8 92.0749 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "100k" (at 177.8 94.6149 0)
@@ -471,10 +471,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "R6") (unit 1)
+          (reference "R7") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "R31") (unit 1)
+          (reference "R36") (unit 1)
         )
       )
     )
@@ -506,7 +506,7 @@
           (reference "C7") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "C25") (unit 1)
+          (reference "C21") (unit 1)
         )
       )
     )
@@ -515,7 +515,7 @@
   (symbol (lib_id "power:GND") (at 175.26 106.68 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 570aaf79-ccc4-4670-920f-9332c576c899)
-    (property "Reference" "#PWR0116" (at 175.26 113.03 0)
+    (property "Reference" "#PWR021" (at 175.26 113.03 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 177.165 107.9499 0)
@@ -531,10 +531,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR0116") (unit 1)
+          (reference "#PWR021") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR0159") (unit 1)
+          (reference "#PWR073") (unit 1)
         )
       )
     )
@@ -543,7 +543,7 @@
   (symbol (lib_id "power:GND") (at 111.125 92.075 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 59b1232e-9690-4ab3-b2f5-480c8cd7df65)
-    (property "Reference" "#PWR0119" (at 104.775 92.075 0)
+    (property "Reference" "#PWR020" (at 104.775 92.075 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 107.95 92.0749 90)
@@ -559,10 +559,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR0119") (unit 1)
+          (reference "#PWR020") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR0162") (unit 1)
+          (reference "#PWR072") (unit 1)
         )
       )
     )
@@ -594,7 +594,7 @@
           (reference "C10") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "C28") (unit 1)
+          (reference "C24") (unit 1)
         )
       )
     )
@@ -626,7 +626,7 @@
           (reference "C8") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "C26") (unit 1)
+          (reference "C22") (unit 1)
         )
       )
     )
@@ -658,7 +658,7 @@
           (reference "C9") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "C27") (unit 1)
+          (reference "C23") (unit 1)
         )
       )
     )
@@ -667,7 +667,7 @@
   (symbol (lib_id "power:GND") (at 94.615 94.615 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 84878a26-3e83-410f-a30f-c962ea1f357b)
-    (property "Reference" "#PWR0118" (at 94.615 100.965 0)
+    (property "Reference" "#PWR019" (at 94.615 100.965 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 96.52 95.8849 0)
@@ -683,10 +683,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR0118") (unit 1)
+          (reference "#PWR019") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR0161") (unit 1)
+          (reference "#PWR071") (unit 1)
         )
       )
     )
@@ -695,7 +695,7 @@
   (symbol (lib_id "Device:R") (at 175.26 102.87 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 87ef1e6d-5a72-4fba-b47f-a8e4de4e51ff)
-    (property "Reference" "R7" (at 177.8 101.5999 0)
+    (property "Reference" "R8" (at 177.8 101.5999 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "25k" (at 177.8 104.1399 0)
@@ -715,10 +715,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "R7") (unit 1)
+          (reference "R8") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "R32") (unit 1)
+          (reference "R37") (unit 1)
         )
       )
     )
@@ -727,7 +727,7 @@
   (symbol (lib_id "power:GND") (at 197.485 97.155 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 9e00e834-641d-4946-abf0-62526f27f21b)
-    (property "Reference" "#PWR0115" (at 197.485 103.505 0)
+    (property "Reference" "#PWR023" (at 197.485 103.505 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 199.39 98.4249 0)
@@ -743,10 +743,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR0115") (unit 1)
+          (reference "#PWR023") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR0158") (unit 1)
+          (reference "#PWR075") (unit 1)
         )
       )
     )
@@ -755,7 +755,7 @@
   (symbol (lib_id "power:GND") (at 187.325 97.155 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 9f5b6deb-b00e-4416-8591-b9b6cda7f6e7)
-    (property "Reference" "#PWR0117" (at 187.325 103.505 0)
+    (property "Reference" "#PWR022" (at 187.325 103.505 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 189.23 98.4249 0)
@@ -771,10 +771,10 @@
     (instances
       (project "laser_module_kicad_prj"
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/a8b7bc32-dbdb-4e6a-ad65-136f99c51162"
-          (reference "#PWR0117") (unit 1)
+          (reference "#PWR022") (unit 1)
         )
         (path "/2ff1a84c-194c-4eca-bf64-700191eb39a0/ff06acb3-81ff-4561-b7e3-3b9aa0875d41"
-          (reference "#PWR0160") (unit 1)
+          (reference "#PWR074") (unit 1)
         )
       )
     )

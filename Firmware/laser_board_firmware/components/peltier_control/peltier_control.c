@@ -9,12 +9,14 @@
 #include "freertos/timers.h"
 
 #include "laser_module_adc.h"
+#include "driver/gpio.h"
 
 #include "pid_controller.h"
 
 static const char *TAG = "PELTIER_CONTROL";
 
-#define USE_PID_CONTROLLER 1
+#define USE_PID_CONTROLLER  1
+#define MORE_PELT_LOG       0
 
 //*****************************************************************************
 // Defines START
@@ -261,7 +263,7 @@ void peltier_control_init_cooling()
 
 void peltier_control_enable_cooling()
 {
-    ESP_LOGI(TAG, "Enable output for cooling ");
+    ESP_LOGI(TAG, "Enable output for cooling!");
     // remove the force level on the generator, so that we can see the PWM again
     ESP_ERROR_CHECK(mcpwm_generator_set_force_level(peltier1_cooling_generator, -1, true));
     ESP_ERROR_CHECK(mcpwm_generator_set_force_level(peltier2_cooling_generator, -1, true));
@@ -269,33 +271,35 @@ void peltier_control_enable_cooling()
 
 void peltier_control_disable_cooling()
 {
-    ESP_LOGI(TAG, "Disable output for forward VOA");
+    ESP_LOGI(TAG, "Disable output for cooling!");
     ESP_ERROR_CHECK(mcpwm_generator_set_force_level(peltier1_cooling_generator, 0, true));
     ESP_ERROR_CHECK(mcpwm_generator_set_force_level(peltier2_cooling_generator, 0, true));
 }
 
 void peltier_control_task(void *pvParameters)
 {
+    esp_log_level_set(TAG, ESP_LOG_DEBUG);
     uint32_t peltier1_desired_temp = 30;
     uint32_t peltier2_desired_temp = 30;
 
     uint32_t peltier1_current_temp;
     uint32_t peltier2_current_temp;
 
+    uint32_t pid_output;
 
     peltier_control_init_cooling();
     peltier_control_enable_cooling();
 
 #if USE_PID_CONTROLLER
     pid_controller_t peltier_pid = {
-        .Kp = 0.1,
-        .Kd = 0.1,
-        .Ki = 0.1,
-        .tau = 0.02,
+        .Kp = 5,
+        .Kd = 0,
+        .Ki = 2,
+        .tau = 0,
         .limitMin = COMPARE_VALUE_MIN,
         .limitMax = COMPARE_VALUE_MAX,
-        .limitIntMin = 0,
-        .limitIntMax = COMPARE_VALUE_MAX / 2,
+        .limitIntMin = -450,
+        .limitIntMax = 450,
         .sampleTime = 1 // 1 second
     };
 
@@ -304,8 +308,22 @@ void peltier_control_task(void *pvParameters)
     int32_t peltier1_diff, peltier2_diff;
 #endif
 
+    gpio_config_t io_conf = {
+        .intr_type = GPIO_INTR_DISABLE,
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_down_en = 1,
+        .pull_up_en = 0,
+    };
+
+    io_conf.pin_bit_mask = (1ULL << PELTIER1_HEATING_PIN);
+    gpio_config(&io_conf);
+
+    io_conf.pin_bit_mask = (1ULL << PELTIER2_HEATING_PIN);
+    gpio_config(&io_conf);
+
     for (;;)
     {
+        esp_log_level_set(TAG, ESP_LOG_INFO);
         xQueueReceive(peltier1_desired_temp_queue, &peltier1_desired_temp, pdMS_TO_TICKS(10));
         xQueueReceive(peltier2_desired_temp_queue, &peltier2_desired_temp, pdMS_TO_TICKS(10));
 
@@ -314,13 +332,15 @@ void peltier_control_task(void *pvParameters)
         ESP_LOGI(TAG, "Laser1 temp: %d | Laser2 temp: %d", peltier1_current_temp, peltier2_current_temp);
 
 #if USE_PID_CONTROLLER
-        pid_controller_update(&peltier_pid, peltier1_desired_temp, peltier1_current_temp);
-        comparator_set_compare_value(comparator1, peltier_pid.output);
-
-        pid_controller_update(&peltier_pid, peltier2_desired_temp, peltier2_current_temp);
-        comparator_set_compare_value(comparator2, peltier_pid.output);
-
-        vTaskDelay(pdMS_TO_TICKS(900)); // Wait ~1 sec
+        // pid_output = pid_controller_update(&peltier_pid, peltier1_desired_temp, peltier1_current_temp);
+        // comparator_set_compare_value(comparator1, pid_output);
+        // ESP_LOGI(TAG, "Peltier1 comp. value: %d", pid_output);
+        
+        // TODO: Add a second peltier controller because it will influence the pid1. 
+        pid_output = pid_controller_update(&peltier_pid, peltier2_desired_temp, peltier2_current_temp);
+        comparator_set_compare_value(comparator2, pid_output);
+        ESP_LOGI(TAG, "Peltier2 comp value %d", pid_output);
+        vTaskDelay(pdMS_TO_TICKS(1000)); // Wait ~1 sec
 #else
         peltier1_diff = peltier1_current_temp - peltier1_desired_temp;
         peltier2_diff = peltier2_current_temp - peltier2_desired_temp;

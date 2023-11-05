@@ -17,12 +17,12 @@ extern QueueHandle_t laser1_desired_current_queue, laser2_desired_current_queue;
 
 void laser_control_task(void *pvParameters)
 {
+    esp_log_level_set(TAG, ESP_LOG_INFO);
     uint32_t laser1_current = 0;
     uint32_t laser2_current = 0;
 
-    uint8_t laser1_enable;
-    uint8_t laser2_enable;
-
+    uint8_t laser1_enable = 0;
+    uint8_t laser2_enable = 0;
     for(;;)
     {
         xQueueReceive(laser1_enable_queue, &laser1_enable, pdMS_TO_TICKS(10));
@@ -34,17 +34,17 @@ void laser_control_task(void *pvParameters)
         uint32_t laser1_md = laser_module_adc_read_laser1_monitor_diode();
         uint32_t laser2_md = laser_module_adc_read_laser2_monitor_diode();
 
-        ESP_LOGI(TAG, "Laser1 monitor diode: %d mV | Laser2 monitor diode: %d mV", laser1_md, laser2_md);
+        ESP_LOGD(TAG, "Laser1 monitor diode: %d mV | Laser2 monitor diode: %d mV", laser1_md, laser2_md);
 
-        if (laser1_enable)
+        if (true)
         {
-            ESP_LOGI(TAG, "Laser1 current: %d", laser1_current);
+            ESP_LOGD(TAG, "Laser1 current: %d", laser1_current);
             laser_module_dac_write_laser1_current(laser1_current);
         }
 
-        if (laser2_enable)
+        if (true)
         {
-            ESP_LOGI(TAG, "Laser2 current: %d", laser2_current);
+            ESP_LOGD(TAG, "Laser2 current: %d", laser2_current);
             laser_module_dac_write_laser2_current(laser2_current);
         }
 

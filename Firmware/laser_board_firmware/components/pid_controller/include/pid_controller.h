@@ -6,11 +6,11 @@ typedef struct pid_controller_t
 
     float tau;
 
+    float sampleTime;
+
     float limitMin, limitMax;
 
     float limitIntMin, limitIntMax;
-
-    float sampleTime;
 
     float integrator;
     float previousError;

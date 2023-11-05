@@ -42,7 +42,7 @@ static void laser_module_queues_init()
 
 void app_main(void)
 {
-    esp_log_default_level = ESP_LOG_DEBUG;
+    esp_log_level_set(TAG, ESP_LOG_INFO);
     ESP_LOGI(TAG, "Startup...");
 
     ESP_LOGI(TAG, "Initialization of nvs, netif and event loop...");

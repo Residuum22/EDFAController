@@ -285,13 +285,14 @@ void peltier_control_task(void *pvParameters)
     uint32_t peltier1_current_temp;
     uint32_t peltier2_current_temp;
 
-    uint32_t pid_output;
+    uint32_t pid1_output;
+    uint32_t pid2_output;
 
     peltier_control_init_cooling();
     peltier_control_enable_cooling();
 
 #if USE_PID_CONTROLLER
-    pid_controller_t peltier_pid = {
+    pid_controller_t peltier1_pid = {
         .Kp = 5,
         .Kd = 0,
         .Ki = 2,
@@ -303,7 +304,20 @@ void peltier_control_task(void *pvParameters)
         .sampleTime = 1 // 1 second
     };
 
-    pid_controller_init(&peltier_pid);
+    pid_controller_t peltier2_pid = {
+        .Kp = 5,
+        .Kd = 0,
+        .Ki = 2,
+        .tau = 0,
+        .limitMin = COMPARE_VALUE_MIN,
+        .limitMax = COMPARE_VALUE_MAX,
+        .limitIntMin = -450,
+        .limitIntMax = 450,
+        .sampleTime = 1 // 1 second
+    };
+
+    pid_controller_init(&peltier1_pid);
+    pid_controller_init(&peltier2_pid);
 #else
     int32_t peltier1_diff, peltier2_diff;
 #endif
@@ -332,14 +346,13 @@ void peltier_control_task(void *pvParameters)
         ESP_LOGI(TAG, "Laser1 temp: %d | Laser2 temp: %d", peltier1_current_temp, peltier2_current_temp);
 
 #if USE_PID_CONTROLLER
-        // pid_output = pid_controller_update(&peltier_pid, peltier1_desired_temp, peltier1_current_temp);
-        // comparator_set_compare_value(comparator1, pid_output);
-        // ESP_LOGI(TAG, "Peltier1 comp. value: %d", pid_output);
+        pid1_output = pid_controller_update(&peltier1_pid, peltier1_desired_temp, peltier1_current_temp);
+        comparator_set_compare_value(comparator1, pid1_output);
+        ESP_LOGI(TAG, "Peltier1 comp. value: %d", pid1_output);
         
-        // TODO: Add a second peltier controller because it will influence the pid1. 
-        pid_output = pid_controller_update(&peltier_pid, peltier2_desired_temp, peltier2_current_temp);
-        comparator_set_compare_value(comparator2, pid_output);
-        ESP_LOGI(TAG, "Peltier2 comp value %d", pid_output);
+        pid2_output = pid_controller_update_peltier(&peltier2_pid, peltier2_desired_temp, peltier2_current_temp);
+        comparator_set_compare_value(comparator2, pid2_output);
+        ESP_LOGI(TAG, "Peltier2 comp value %d", pid2_output);
         vTaskDelay(pdMS_TO_TICKS(1000)); // Wait ~1 sec
 #else
         peltier1_diff = peltier1_current_temp - peltier1_desired_temp;

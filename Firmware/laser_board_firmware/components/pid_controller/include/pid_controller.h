@@ -23,4 +23,6 @@ typedef struct pid_controller_t
 
 void pid_controller_init(pid_controller_t *pid);
 
-float pid_controller_update(pid_controller_t *pid, float setpoint, float measurement);
+float pid_controller_update_laser(pid_controller_t *pid, float setpoint, float measurement);
+
+float pid_controller_update_peltier(pid_controller_t *pid, float setpoint, float measurement);

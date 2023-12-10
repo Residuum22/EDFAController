@@ -75,23 +75,39 @@
               <label class="form-check-label" for="laser_id_{{laser_id}}_on_off_switch">{{laser_id}}
                 engedélyezése/tiltása</label>
             </div>
+
             <div class="row">
-              <div class="col-sm-8">
+              <div class="col-md-4">
                 <p class="card-text" id="laser_module_{{laser_id}}_laser_diode_desired_current">
-                  Lézer dióda árama: 0 mA
+                  Lézer dióda árama:
                 </p>
               </div>
-              <div class="col">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary"
-                    onclick="increment_laser_diode_desired_current('{{laser_id}}')">+</button>
-                  <button type="button" class="btn btn-secondary"
-                    onclick="decrement_laser_diode_desired_current('{{laser_id}}')">-</button>
-                </div>
+
+              <div class="col-md-4">
+                <form class="form-inline">
+                  <div class="form-group col-md-8">
+
+                    {% if '1' in laser_module_id['laser_module_id'] %}
+                    <input class="form-control mx-sm-3" type="number" id="laser_module_{{laser_id}}_laser_current" min="0" max="360"></input>
+                    {% elif '2' or '3' in laser_module_id['laser_module_id'] %}
+                    <input class="form-control mx-sm-3" type="number" id="laser_module_{{laser_id}}_laser_current" min="0" max="700"></input>
+                    {% endif %}
+                    
+                  </div>
+                </form>
               </div>
+
+              <div class="col-md-2">
+                <button type="button" class="btn btn-primary"
+                  onclick="send_laser_diode_desired_current('{{laser_id}}')">
+                  Beállít
+                </button>
+              </div>
+
             </div>
+
             <p class="card-text" id="laser_id_{{laser_id}}_temperature">Hőmérséklet: 0 °C</p>
-            <p class="card-text" id="laser_id_{{laser_id}}_monitor_diode_current">Becsült monitor dióda árama: 0 µA</p>
+            <p class="card-text" id="laser_id_{{laser_id}}_monitor_diode_current">Monitor dióda feszültsége: 0 mV</p>
             </p>
             {% endfor %}
             <!-- Module emergency shutdown -->
@@ -110,16 +126,23 @@
           <div class="card-body">
             <h5 class="card-title text-center">VOA (Variable Optical Attenuator)</h5>
             <div class="row mt-3">
-              <div class="col-sm-8">
-                <p class="card-text" id="voa_attenuation">
-                  Csillapítás: 0 dB
+              <div class="col-md-4">
+                <p class="card-text" id="voa_attenuation_name">
+                  Csillapítás:
                 </p>
               </div>
+
               <div class="col">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-secondary" onclick="increment_voa_attenuation()">+</button>
-                  <button type="button" class="btn btn-secondary" onclick="decrement_voa_attenuation()">-</button>
+                <div class="col-md-8">
+                  <input class="form-control" type="number" id="voa_attenuation" min="0" max="15" />
                 </div>
+              </div>
+
+              <div class="col-md-4">
+                <button type="button" class="btn btn-primary"
+                  onclick="send_voa_desired_current()">
+                  Beállít
+                </button>
               </div>
             </div>
             <div class="text-center mt-3">

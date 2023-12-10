@@ -23,29 +23,18 @@ function update_voa_pos(attenuation) {
     send_att_backend(attenuation)
 }
 
-function increment_voa_attenuation() {
-    let current_attenuation = document.getElementById("voa_attenuation").innerHTML;
-    let current_attenuation_number = parseInt(current_attenuation.match(/\d/g).join(""));
+function send_voa_desired_current() {
+    let current_attenuation = document.getElementById("voa_attenuation").value;
+    let current_attenuation_number = parseFloat(current_attenuation);
 
-    if (current_attenuation_number < 15) {
-        current_attenuation_number = current_attenuation_number + voa_attenuation_delta;
+    if (current_attenuation_number <= 15) {
+        current_attenuation_number = current_attenuation_number;
+        send_att_backend(current_attenuation_number)
     }
-
-    document.getElementById("voa_attenuation").innerHTML = "Csillapítás: " + current_attenuation_number + " dB";
-    send_att_backend(current_attenuation_number)
-
-}
-
-function decrement_voa_attenuation() {
-    let current_pos = document.getElementById("voa_attenuation").innerHTML;
-    let current_pos_int = parseInt(current_pos.match(/\d/g).join(""));
-
-    if (current_pos_int > 0) {
-        current_pos_int = current_pos_int - voa_attenuation_delta;
+    else
+    {
+        window.alert(`A VOA csillapítás csak 0 és 15 dB között lehet!`);
     }
-
-    document.getElementById("voa_attenuation").innerHTML = "Csillapítás: " + current_pos_int + " dB";
-    send_att_backend(current_pos_int)
 }
 
 function reset_voa_attenuation() {

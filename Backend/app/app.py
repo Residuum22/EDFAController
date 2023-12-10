@@ -51,7 +51,7 @@ class laser_module_data_set_module_1480(BaseModel):
     
 # VOA module data report
 class voa_module_data_set(BaseModel):
-    attenuation: int
+    attenuation: float
 
 
 # ------------------------------------------------------------------------------
@@ -244,7 +244,7 @@ async def emergency_stop_laser_id(id: str):
         mqtt.publish('/laser_module_set/1', jsonable_encoder(laser_module_1_set))
         
 @app.post("/set_voa_module_attenuation/{attenuation}")
-async def set_voa_module_attenuation(attenuation: int):
+async def set_voa_module_attenuation(attenuation: float):
     print(f'Attenuation set to attenuation to: {attenuation}')
     voa_module_set.attenuation = attenuation
     json_data = jsonable_encoder(voa_module_set)

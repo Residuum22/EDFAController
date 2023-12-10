@@ -80,45 +80,31 @@ function decrement_laser_desired_temperature(laser_module_id) {
     document.getElementById(laser_name).innerHTML = "Lézerek kívánt hőmérséklete: " + current_desired_temperature_int + " °C";
 }
 
-function increment_laser_diode_desired_current(laser_id) {
-    let laser_name = "laser_module_" + laser_id + "_laser_diode_desired_current";
-    let current_laser_diode_current = document.getElementById(laser_name).innerHTML;
-    let current_laser_diode_current_int = parseInt(current_laser_diode_current.match(/\d/g).join(""));
+function send_laser_diode_desired_current(laser_id) {
+    let laser_name = "laser_module_" + laser_id + "_laser_current";
+    console.log(laser_name)
+    let current_laser_diode_current = document.getElementById(laser_name).value;
 
+    let current_laser_diode_current_int = parseInt(current_laser_diode_current);
 
     if (['LD1', 'LD6'].includes(laser_id)) {
-        if (current_laser_diode_current_int < 380) {
-            current_laser_diode_current_int = current_laser_diode_current_int + laser_module_desired_laser_diode_offset;
+        if (current_laser_diode_current_int <= 360) {
             send_desLasCur_backend(laser_id, current_laser_diode_current_int)
+            document.getElementById(laser_name).value = current_laser_diode_current_int
+        }
+        else {
+            window.alert(`A ${laser_id} árama csak 0 és 360 mA között lehet!`);
         }
     }
     else {
-        if (current_laser_diode_current_int < 700) {
-            current_laser_diode_current_int = current_laser_diode_current_int + laser_module_desired_laser_diode_offset;
+        if (current_laser_diode_current_int <= 700) {
             send_desLasCur_backend(laser_id, current_laser_diode_current_int)
+            document.getElementById(laser_name).value = current_laser_diode_current_int
+        }
+        else {
+            window.alert(`A ${laser_id} árama csak 0 és 700 mA között lehet!`);
         }
     }
-    document.getElementById(laser_name).innerHTML = "Lézer dióda árama: " + current_laser_diode_current_int + " mA";
-}
-
-function decrement_laser_diode_desired_current(laser_id) {
-    let laser_name = "laser_module_" + laser_id + "_laser_diode_desired_current";
-    let current_desired_monitor_diode_current = document.getElementById(laser_name).innerHTML;
-    let current_laser_diode_current_int = parseInt(current_desired_monitor_diode_current.match(/\d/g).join(""));
-
-    if (['LD1', 'LD6'].includes(laser_id)) {
-        if (current_laser_diode_current_int > 0) {
-            current_laser_diode_current_int = current_laser_diode_current_int - laser_module_desired_laser_diode_offset;
-            send_desLasCur_backend(laser_id, current_laser_diode_current_int)
-        }
-    }
-    else {
-        if (current_laser_diode_current_int > 0) {
-            current_laser_diode_current_int = current_laser_diode_current_int - laser_module_desired_laser_diode_offset;
-            send_desLasCur_backend(laser_id, current_laser_diode_current_int)
-        }
-    }
-    document.getElementById(laser_name).innerHTML = "Lézer dióda árama: " + current_laser_diode_current_int + " mA";
 }
 
 function laser_emergency_stop(laser_id) {

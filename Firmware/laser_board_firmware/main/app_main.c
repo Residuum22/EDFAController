@@ -33,8 +33,8 @@ static void laser_module_queues_init()
     peltier1_desired_temp_queue = xQueueCreate(10, sizeof(uint8_t));
     peltier2_desired_temp_queue = xQueueCreate(10, sizeof(uint8_t));
 
-    laser1_enable_queue = xQueueCreate(10, sizeof(uint8_t));
-    laser2_enable_queue = xQueueCreate(10, sizeof(uint8_t));
+    laser1_enable_queue = xQueueCreate(10, sizeof(bool));
+    laser2_enable_queue = xQueueCreate(10, sizeof(bool));
 
     laser1_desired_current_queue = xQueueCreate(10, sizeof(uint32_t));
     laser2_desired_current_queue = xQueueCreate(10, sizeof(uint32_t));

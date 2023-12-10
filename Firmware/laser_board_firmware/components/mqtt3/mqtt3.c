@@ -110,9 +110,9 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 #endif
         // Parse enable's
         cJSON *laser1_enable_json = cJSON_GetObjectItemCaseSensitive(laser1_json, "enabled");
-        uint8_t laser1_enabled = cJSON_IsTrue(laser1_enable_json) == cJSON_True;
+        bool laser1_enabled = (bool)(cJSON_IsTrue(laser1_enable_json) == cJSON_True);
         cJSON *laser2_enable_json = cJSON_GetObjectItemCaseSensitive(laser2_json, "enabled");
-        uint8_t laser2_enabled = cJSON_IsTrue(laser2_enable_json) == cJSON_True;
+        bool laser2_enabled = (bool)(cJSON_IsTrue(laser2_enable_json) == cJSON_True);
         ESP_LOGI(TAG, "Enable/Disable| Laser1: %d, Laser2: %d", laser1_enabled, laser2_enabled);
         xQueueSend(laser1_enable_queue, &laser1_enabled, pdMS_TO_TICKS(10));
         xQueueSend(laser2_enable_queue, &laser2_enabled, pdMS_TO_TICKS(10));

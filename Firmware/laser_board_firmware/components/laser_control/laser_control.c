@@ -39,14 +39,14 @@ void laser_control_task(void *pvParameters)
   uint32_t laser2_output_current = 0;
 
   pid_controller_t laser1_pid = {
-    .Kp = 0.5,
+    .Kp = 0.1,
     .Kd = 0,
-    .Ki = 2,
+    .Ki = 0.5,
     .tau = 0,
     .limitMin = 0,
     .limitMax = 255,
-    .limitIntMin = -120,
-    .limitIntMax = 120,
+    .limitIntMin = -300,
+    .limitIntMax = 300,
     .sampleTime = 1 // 1 second
   };
 
@@ -83,7 +83,6 @@ void laser_control_task(void *pvParameters)
       laser_module_dac_write_laser2_current(laser2_current);
       vTaskDelay(1000);
       laser2_md_target = laser_module_adc_read_laser2_monitor_diode();
-      // pid_controller_init(&laser2_pid); // Maybe this causes the big spike when it started to controlling. 
     }
 
     laser1_md = laser_module_adc_read_laser1_monitor_diode();
@@ -91,17 +90,17 @@ void laser_control_task(void *pvParameters)
 
     ESP_LOGI(TAG, "Laser1 monitor diode: %d mV | Laser2 monitor diode: %d mV", laser1_md, laser2_md);
 
-    if (true)
+    if (laser1_enable_queue)
     {
-      // laser1_output_current = pid_controller_update_laser(&laser1_pid, laser1_md_target, laser1_md);
-      // ESP_LOGI(TAG, "Laser1 current: %0.2f", laser1_output_current);
+      laser1_output_current = pid_controller_update_laser(&laser1_pid, laser1_md_target, laser1_md);
+      ESP_LOGD(TAG, "Laser1 current: %0.2f", laser1_output_current);
       laser_module_dac_write_laser1_current(laser1_output_current);
     }
 
-    if (true)
+    if (laser2_enable_queue)
     {
       laser2_output_current = (uint32_t)pid_controller_update_laser(&laser2_pid, laser2_md_target, laser2_md);
-      ESP_LOGI(TAG, "Laser2 current: %d", laser2_output_current);
+      ESP_LOGD(TAG, "Laser2 current: %d", laser2_output_current);
       laser_module_dac_write_laser2_current(laser2_output_current);
     }
 

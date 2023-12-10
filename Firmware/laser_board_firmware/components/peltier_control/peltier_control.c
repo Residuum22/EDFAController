@@ -293,9 +293,9 @@ void peltier_control_task(void *pvParameters)
 
 #if USE_PID_CONTROLLER
     pid_controller_t peltier1_pid = {
-        .Kp = 5,
+        .Kp = -0.2,
         .Kd = 0,
-        .Ki = 2,
+        .Ki = -2,
         .tau = 0,
         .limitMin = COMPARE_VALUE_MIN,
         .limitMax = COMPARE_VALUE_MAX,

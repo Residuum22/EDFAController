@@ -12,15 +12,20 @@
 #include "esp_log.h"
 
 #include "common_gpio.h"
+#include "math.h"
 
 dac_oneshot_handle_t laser1_dac_handle;
 dac_oneshot_handle_t laser2_dac_handle;
 
 static uint8_t convert_current_to_raw(uint32_t current)
 {
-
-  // TODO: Add conversion between the max current and the value
-  return current;
+#if CONFIG_LASER_MODULE_NUMBER == 1
+  // 400 mA means 255 DAC value by 980 nm laser
+  return (uint8_t)floor(current * 0.6375);
+#else
+  // 700 mA means 255 DAC value by 1480 nm laser
+  return (uint8_t)floor(current * 0.36428571428571);
+#endif
 }
 
 static void write_laser1_raw_dac_value(uint8_t dac_value)

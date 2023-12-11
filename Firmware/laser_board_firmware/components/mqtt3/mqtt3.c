@@ -37,6 +37,11 @@ extern QueueHandle_t peltier1_desired_temp_queue, peltier2_desired_temp_queue;
 extern QueueHandle_t laser1_enable_queue, laser2_enable_queue;
 extern QueueHandle_t laser1_desired_current_queue, laser2_desired_current_queue;
 
+extern QueueHandle_t peltier1_temp_queue, peltier2_temp_queue;
+extern QueueHandle_t laser1_monitor_diode_voltage_queue, laser2_monitor_diode_voltage_queue;
+
+esp_mqtt_client_handle_t client_local;
+
 static void log_error_if_nonzero(const char *message, int error_code)
 {
     if (error_code != 0)
@@ -155,7 +160,68 @@ void mqtt_app_start(void)
     };
 
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
+    client_local = client;
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
     esp_mqtt_client_start(client);
+}
+
+void mqtt_send_task(void *pvParameters)
+{
+    uint8_t laser1_temp = 0, laser2_temp = 0;
+    uint32_t laser1_monitor_diode_voltage = 0, laser2_monitor_diode_voltage = 0;
+    cJSON *laser_report;
+    cJSON *laser1_struct;
+    cJSON *laser2_struct;
+
+    laser_report = cJSON_CreateObject();
+    laser1_struct = cJSON_CreateObject();
+    laser2_struct = cJSON_CreateObject();
+
+#if CONFIG_LASER_MODULE_NUMBER == 1
+    cJSON_AddStringToObject(laser1_struct, "laser_id", "LD1");
+    cJSON_AddStringToObject(laser2_struct, "laser_id", "LD6");
+#elif CONFIG_LASER_MODULE_NUMBER == 2
+    cJSON_AddStringToObject(laser1_struct, "laser_id", "LD2");
+    cJSON_AddStringToObject(laser2_struct, "laser_id", "LD3");
+#elif CONFIG_LASER_MODULE_NUMBER == 3
+    cJSON_AddStringToObject(laser1_struct, "laser_id", "LD4");
+    cJSON_AddStringToObject(laser2_struct, "laser_id", "LD5");
+#endif
+    cJSON_AddNumberToObject(laser1_struct, "temperature", 0);
+    cJSON_AddNumberToObject(laser2_struct, "temperature", 0);
+
+    cJSON_AddNumberToObject(laser1_struct, "monitor_diode_current", 0);
+    cJSON_AddNumberToObject(laser2_struct, "monitor_diode_current", 0);
+
+    cJSON_AddNumberToObject(laser1_struct, "laser_current", 0);
+    cJSON_AddNumberToObject(laser2_struct, "laser_current", 0);
+
+    cJSON_AddNumberToObject(laser_report, "module_number", CONFIG_LASER_MODULE_NUMBER);
+    cJSON_AddNumberToObject(laser_report, "time_stamp", 0);
+
+    char* topic = "report_laser_module_data";
+    for (;;)
+    {
+        xQueueReceive(peltier1_temp_queue, &laser1_temp, pdMS_TO_TICKS(10));
+        cJSON_SetIntValue(cJSON_GetObjectItem(laser1_struct, "temperature"), laser1_temp);
+
+        xQueueReceive(peltier2_temp_queue, &laser2_temp, pdMS_TO_TICKS(10));
+        cJSON_SetIntValue(cJSON_GetObjectItem(laser2_struct, "temperature"), laser2_temp);
+
+
+        xQueueReceive(laser1_monitor_diode_voltage_queue, &laser1_monitor_diode_voltage, pdMS_TO_TICKS(10));
+        cJSON_SetIntValue(cJSON_GetObjectItem(laser1_struct, "monitor_diode_current"), laser1_monitor_diode_voltage);
+
+        xQueueReceive(laser2_monitor_diode_voltage_queue, &laser2_monitor_diode_voltage, pdMS_TO_TICKS(10));
+        cJSON_SetIntValue(cJSON_GetObjectItem(laser2_struct, "monitor_diode_current"), laser2_monitor_diode_voltage);
+
+        cJSON_AddObjectToObject(laser_report, cJSON_Print(laser1_struct));
+        cJSON_AddObjectToObject(laser_report, cJSON_Print(laser2_struct));
+
+        esp_mqtt_client_publish(client_local, topic, cJSON_Print(laser_report), strlen(cJSON_Print(laser_report)), 0, 0);
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    
 }

@@ -12,22 +12,22 @@
 
 #include "pid_controller.h"
 
+#include "mqtt_client.h"
+
 static const char *TAG = "LASER_CONTROL";
 
 extern QueueHandle_t laser1_enable_queue, laser2_enable_queue;
 extern QueueHandle_t laser1_desired_current_queue, laser2_desired_current_queue;
+extern QueueHandle_t laser1_monitor_diode_voltage_queue, laser2_monitor_diode_voltage_queue;
 
 void laser_control_task(void *pvParameters)
 {
   esp_log_level_set(TAG, ESP_LOG_INFO);
-  uint32_t laser1_current = 0;
-  uint32_t laser2_current = 0;
+  bool laser1_current = 0;
+  bool laser2_current = 0;
 
   uint8_t laser1_enable = 0;
   uint8_t laser2_enable = 0;
-
-  // uint32_t monitor_diode1_voltage = 0;
-  // uint32_t monitor_diode2_voltage = 0;
 
   uint32_t laser1_md = 0;
   uint32_t laser2_md = 0;
@@ -79,29 +79,38 @@ void laser_control_task(void *pvParameters)
 
     if (xQueueReceive(laser2_desired_current_queue, &laser2_current, pdMS_TO_TICKS(10)))
     {
-      // Only this is tested
       laser_module_dac_write_laser2_current(laser2_current);
       vTaskDelay(1000);
       laser2_md_target = laser_module_adc_read_laser2_monitor_diode();
     }
 
     laser1_md = laser_module_adc_read_laser1_monitor_diode();
+    xQueueSend(laser1_monitor_diode_voltage_queue, &laser1_md, pdMS_TO_TICKS(10));
     laser2_md = laser_module_adc_read_laser2_monitor_diode();
+    xQueueSend(laser2_monitor_diode_voltage_queue, &laser2_md, pdMS_TO_TICKS(10));
 
     ESP_LOGI(TAG, "Laser1 monitor diode: %d mV | Laser2 monitor diode: %d mV", laser1_md, laser2_md);
 
-    if (laser1_enable_queue)
+    if (laser1_enable)
     {
       laser1_output_current = pid_controller_update_laser(&laser1_pid, laser1_md_target, laser1_md);
       ESP_LOGD(TAG, "Laser1 current: %0.2f", laser1_output_current);
       laser_module_dac_write_laser1_current(laser1_output_current);
     }
+    else 
+    {
+      laser_module_dac_write_laser1_current(0);
+    }
 
-    if (laser2_enable_queue)
+    if (laser2_enable)
     {
       laser2_output_current = (uint32_t)pid_controller_update_laser(&laser2_pid, laser2_md_target, laser2_md);
       ESP_LOGD(TAG, "Laser2 current: %d", laser2_output_current);
       laser_module_dac_write_laser2_current(laser2_output_current);
+    }
+    else 
+    {
+      laser_module_dac_write_laser1_current(0);
     }
 
     vTaskDelay(pdMS_TO_TICKS(1000));

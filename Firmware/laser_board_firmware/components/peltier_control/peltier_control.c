@@ -39,6 +39,8 @@ static const char *TAG = "PELTIER_CONTROL";
 
 // This variable is located in the main component (main.c file)
 extern QueueHandle_t peltier1_desired_temp_queue, peltier2_desired_temp_queue;
+extern QueueHandle_t peltier1_temp_queue, peltier2_temp_queue;
+
 
 // ESP32 only have 2 MCPWM groups, each have 2 generator
 typedef enum peltier_mcpwm_group_id
@@ -291,7 +293,6 @@ void peltier_control_task(void *pvParameters)
     peltier_control_init_cooling();
     peltier_control_enable_cooling();
 
-#if USE_PID_CONTROLLER
     pid_controller_t peltier1_pid = {
         .Kp = -0.2,
         .Kd = 0,
@@ -318,9 +319,6 @@ void peltier_control_task(void *pvParameters)
 
     pid_controller_init(&peltier1_pid);
     pid_controller_init(&peltier2_pid);
-#else
-    int32_t peltier1_diff, peltier2_diff;
-#endif
 
     gpio_config_t io_conf = {
         .intr_type = GPIO_INTR_DISABLE,
@@ -348,10 +346,12 @@ void peltier_control_task(void *pvParameters)
         }
 
         peltier1_current_temp = laser_module_adc_read_temp1();
+        xQueueSend(peltier1_temp_queue, &peltier1_current_temp, pdMS_TO_TICKS(10));
         peltier2_current_temp = laser_module_adc_read_temp2();
+        xQueueSend(peltier2_temp_queue, &peltier2_current_temp, pdMS_TO_TICKS(10));
+
         ESP_LOGI(TAG, "Laser1 temp: %d | Laser2 temp: %d", peltier1_current_temp, peltier2_current_temp);
 
-#if USE_PID_CONTROLLER
         pid1_output = pid_controller_update_peltier(&peltier1_pid, peltier1_desired_temp, peltier1_current_temp);
         comparator_set_compare_value(comparator1, pid1_output);
         ESP_LOGD(TAG, "Peltier1 comp. value: %d", pid1_output);
@@ -360,28 +360,5 @@ void peltier_control_task(void *pvParameters)
         comparator_set_compare_value(comparator2, pid2_output);
         ESP_LOGD(TAG, "Peltier2 comp value %d", pid2_output);
         vTaskDelay(pdMS_TO_TICKS(1000)); // Wait ~1 sec
-#else
-        peltier1_diff = peltier1_current_temp - peltier1_desired_temp;
-        peltier2_diff = peltier2_current_temp - peltier2_desired_temp;
-
-        if (peltier1_diff >= 5)
-        {
-            comparator_set_compare_value(comparator1, COMPARE_VALUE_MAX / 2);
-        }
-        else if (peltier1_diff <= - 5)
-        {
-            comparator_set_compare_value(comparator1, COMPARE_VALUE_MIN);
-        }
-
-        if (peltier2_diff >= 5)
-        {
-            comparator_set_compare_value(comparator2, COMPARE_VALUE_MAX / 2);
-        }
-        else if (peltier2_diff <= -5)
-        {
-            comparator_set_compare_value(comparator2, COMPARE_VALUE_MIN);
-        }
-        vTaskDelay(pdMS_TO_TICKS(1000));
-#endif
     }
 }

@@ -26,6 +26,8 @@ static const char *TAG = "MAIN";
 QueueHandle_t peltier1_desired_temp_queue, peltier2_desired_temp_queue;
 QueueHandle_t laser1_enable_queue, laser2_enable_queue;
 QueueHandle_t laser1_desired_current_queue, laser2_desired_current_queue;
+QueueHandle_t peltier1_temp_queue, peltier2_temp_queue;
+QueueHandle_t laser1_monitor_diode_voltage_queue, laser2_monitor_diode_voltage_queue;
 
 static void laser_module_queues_init()
 {
@@ -38,6 +40,12 @@ static void laser_module_queues_init()
 
     laser1_desired_current_queue = xQueueCreate(10, sizeof(uint32_t));
     laser2_desired_current_queue = xQueueCreate(10, sizeof(uint32_t));
+
+    peltier1_temp_queue = xQueueCreate(10, sizeof(uint8_t));
+    peltier2_temp_queue = xQueueCreate(10, sizeof(uint8_t));
+
+    laser1_monitor_diode_voltage_queue = xQueueCreate(10, sizeof(uint32_t));
+    laser2_monitor_diode_voltage_queue = xQueueCreate(10, sizeof(uint32_t));
 }
 
 void app_main(void)
@@ -72,7 +80,10 @@ void app_main(void)
     xTaskCreate(peltier_control_task, "peltier_control_task", 4096, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "Start Laser current control task...");
-    xTaskCreate(laser_control_task, "laser_control_task", 4096, NULL, 5, NULL);
+    xTaskCreate(laser_control_task, "laser_control_task", 4096, NULL, 4, NULL);
+
+    ESP_LOGI(TAG, "Start MQTT send task...");
+    xTaskCreate(mqtt_send_task, "mqtt_send_task", 4096, NULL, 6, NULL);
 
     ESP_LOGI(TAG, "Initialization done.");
 }

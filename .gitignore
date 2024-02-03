@@ -50,3 +50,5 @@ Firmware/voa_board_firmware/components/led_indicator/test
 Firmware/voa_board_firmware/dependencies.lock
 Firmware/laser_board_firmware/build
 Firmware/laser_board_firmware/sdkconfig.old
+
+Firmware/TestSoftwares/EDFA_cJSON/build

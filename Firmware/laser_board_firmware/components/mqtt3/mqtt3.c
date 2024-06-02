@@ -42,6 +42,14 @@ extern QueueHandle_t laser1_monitor_diode_voltage_queue, laser2_monitor_diode_vo
 
 esp_mqtt_client_handle_t client_local;
 
+#if CONFIG_LASER_MODULE_NUMBER == 1
+char *laser_module_name1 = "laser_976_1";
+char *laser_module_name2 = "laser_976_2";
+#elif CONFIG_LASER_MODULE_NUMBER == 2 || CONFIG_LASER_MODULE_NUMBER == 3
+char *laser_module_name1 = "laser_1480_1";
+char *laser_module_name2 = "laser_1480_2";
+#endif
+
 static void log_error_if_nonzero(const char *message, int error_code)
 {
     if (error_code != 0)
@@ -106,13 +114,10 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
             cJSON_Delete(settings_json);
         settings_json = cJSON_Parse(event->data);
         // uint8_t report_interval = (uint8_t)cJSON_GetNumberValue(cJSON_GetObjectItemCaseSensitive(settings_json, "report_interval"));
-#if CONFIG_LASER_MODULE_NUMBER == 1
-        laser1_json = cJSON_GetObjectItemCaseSensitive(settings_json, "laser_976_1");
-        laser2_json = cJSON_GetObjectItemCaseSensitive(settings_json, "laser_976_2");
-#else
-        laser1_json = cJSON_GetObjectItemCaseSensitive(settings_json, "laser_1480_1");
-        laser2_json = cJSON_GetObjectItemCaseSensitive(settings_json, "laser_1480_2");
-#endif
+
+        laser1_json = cJSON_GetObjectItemCaseSensitive(settings_json, laser_module_name1);
+        laser2_json = cJSON_GetObjectItemCaseSensitive(settings_json, laser_module_name2);
+
         // Parse enable's
         cJSON *laser1_enable_json = cJSON_GetObjectItemCaseSensitive(laser1_json, "enabled");
         bool laser1_enabled = (bool)(cJSON_IsTrue(laser1_enable_json) == cJSON_True);
@@ -198,9 +203,13 @@ void mqtt_send_task(void *pvParameters)
     cJSON_AddNumberToObject(laser2_struct, "laser_current", 0);
 
     cJSON_AddNumberToObject(laser_report, "module_number", CONFIG_LASER_MODULE_NUMBER);
+
     cJSON_AddNumberToObject(laser_report, "time_stamp", 0);
 
-    char* topic = "report_laser_module_data";
+    cJSON_AddItemToObject(laser_report, laser_module_name1, laser1_struct);
+    cJSON_AddItemToObject(laser_report, laser_module_name2, laser2_struct);
+
+    char* topic = "/report_laser_module_data";
     for (;;)
     {
         xQueueReceive(peltier1_temp_queue, &laser1_temp, pdMS_TO_TICKS(10));
@@ -216,12 +225,21 @@ void mqtt_send_task(void *pvParameters)
         xQueueReceive(laser2_monitor_diode_voltage_queue, &laser2_monitor_diode_voltage, pdMS_TO_TICKS(10));
         cJSON_SetIntValue(cJSON_GetObjectItem(laser2_struct, "monitor_diode_current"), laser2_monitor_diode_voltage);
 
-        cJSON_AddObjectToObject(laser_report, cJSON_Print(laser1_struct));
-        cJSON_AddObjectToObject(laser_report, cJSON_Print(laser2_struct));
+        cJSON_ReplaceItemInObject(laser_report, laser_module_name1, laser1_struct);
+        cJSON_ReplaceItemInObject(laser_report, laser_module_name2, laser2_struct);
 
-        esp_mqtt_client_publish(client_local, topic, cJSON_Print(laser_report), strlen(cJSON_Print(laser_report)), 0, 0);
+        char* laser_report_string = cJSON_Print(laser_report);
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        if (laser_report_string == NULL)
+        {
+            ESP_LOGE(TAG, "Failed to print laser report JSON!");
+            continue;
+        }
+        esp_mqtt_client_publish(client_local, topic, laser_report_string, strlen(laser_report_string), 0, 0);
+
+        free(laser_report_string);
+
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
     
 }

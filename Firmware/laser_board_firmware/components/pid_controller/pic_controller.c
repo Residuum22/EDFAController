@@ -49,7 +49,7 @@ float pid_controller_update_peltier(pid_controller_t *pid, float setpoint, float
 {
     float error = setpoint - measurement;
     
-    esp_log_level_set(TAG, ESP_LOG_DEBUG);
+    esp_log_level_set(TAG, ESP_LOG_INFO);
     ESP_LOGD(TAG, "%0.2f", error);
 
     pid_controller_control(pid, error, measurement);

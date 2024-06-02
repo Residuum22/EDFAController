@@ -140,11 +140,16 @@ def send_laser_module_data(id: int):
 @app.get("/")
 async def root(request: Request):
     laser_module_instances = [
-        {'laser_module_id': '1', 'laser_id': ['LD1', 'LD6']},
-        {'laser_module_id': '2', 'laser_id': ['LD2', 'LD3']},
-        {'laser_module_id': '3', 'laser_id': ['LD4', 'LD5']}
+        {'laser_module_id': '1', 'laser_id': ['LD1', 'LD6'], 'settings': laser_module_1_set},
+        {'laser_module_id': '2', 'laser_id': ['LD2', 'LD3'], 'settings': laser_module_2_set},
+        {'laser_module_id': '3', 'laser_id': ['LD4', 'LD5'], 'settings': laser_module_3_set}
         ]
-    return templates.TemplateResponse("index.html", {"request": request, 'laser_module_instances': laser_module_instances})
+    
+    return templates.TemplateResponse("index.html",
+        {
+            "request": request,
+            'laser_module_instances': laser_module_instances,
+        })
 
 @app.get("/help")
 async def root(request: Request):

@@ -24,7 +24,7 @@ function post_call(path, json_body, callback) {
  */
 function send_desTemp_backend(laser_id, desTemp) {
     let path = "/set_laser_module_desired_temperature/" + laser_id + '?' + 'desired_temperature=' + desTemp;
-    post_call_voa(path, null, null);
+    post_call(path, null, null);
 }
 
 /**
@@ -32,7 +32,7 @@ function send_desTemp_backend(laser_id, desTemp) {
  */
 function send_desLasCur_backend(laser_id, desMonCur) {
     let path = "/set_laser_id_desired_laser_cur/" + laser_id + '?' + 'current=' + desMonCur;
-    post_call_voa(path, null, null);
+    post_call(path, null, null);
 }
 
 /**

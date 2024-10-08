@@ -98,7 +98,7 @@ voa_module_set = voa_module_data_set(attenuation=0)
 async def websocket_send_data(ws: WebSocket, data: json):
     try:
         if ws is not None:
-            print(f"Sending data to: {ws} with data {data}")
+            # print(f"Sending data to: {ws} with data {data}")
             await asyncio.wait_for(ws.send_json(data), timeout=1.0)
     except Exception:
         return

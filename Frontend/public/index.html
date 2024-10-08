@@ -3,8 +3,7 @@
 <!-- the page starts here -->
 
 <head>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
   <!-- Required meta tags -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,6 +30,8 @@
 </header>
 
 <body>
+  <div class="p-3 mb-2 bg-warning text-dark">FIGYELEM: Ha az oldal újratöltődik az alap beállítások jelennek meg, 
+    de a rendszer az előzőleg kiküldött állapotban van.</div>
   <div class="container">
     <div class="row mt-3">
       <!-- Instances generation - this will generate module 1,2,3 -->
@@ -46,8 +47,7 @@
 
               <div class="col-sm-8">
                 <p class="card-text" id="laser_module_{{laser_module_id['laser_module_id']}}_desired_temperature">
-                  Lézerek kívánt
-                  hőmérséklete: {{laser_module_id['settings'][desired_temperature]}} °C</p>
+                  Lézerek kívánt hőmérséklete: 50 °C</p>
               </div>
 
               <div class="col text-right">
@@ -154,10 +154,8 @@
       </div>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-    crossorigin="anonymous"></script>
-  <script src="/static/voa_events.js"></script>
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="/static/voa_events.js"></script>0
   <script src="/static/laser_events.js"></script>
   <script src="/static/websocket_handling.js"></script>
 </body>

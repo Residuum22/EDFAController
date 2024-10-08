@@ -111,6 +111,7 @@ templates = Jinja2Templates(directory="Frontend/public")  # Future use
 app.mount("/static", StaticFiles(directory="Frontend/static"), name="static")
 app.mount("/public", StaticFiles(directory="Frontend/public"), name="public")
 app.mount("/img", StaticFiles(directory="Frontend/public/assets/img"), name="img")
+app.mount("/node_modules", StaticFiles(directory="Frontend/node_modules"), name="node_modules")
 
 
 mqtt_config = MQTTConfig()

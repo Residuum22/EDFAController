@@ -1,6 +1,6 @@
 const laser_module_desired_temperature_offset = 5;
 const laser_module_desired_laser_diode_offset = 20;
-const HOST = "http://localhost:8000"
+const HOST = "http://192.168.22.100:8000"
 
 /**
  * This function is a generic function which can send data to

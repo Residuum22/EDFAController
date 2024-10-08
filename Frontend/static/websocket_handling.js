@@ -1,4 +1,4 @@
-const WS_HOST = "ws://localhost:8000"
+const WS_HOST = "ws://192.168.22.100:8000"
 
 var Socket = new WebSocket(WS_HOST + "/frontend_get_module_data");
 

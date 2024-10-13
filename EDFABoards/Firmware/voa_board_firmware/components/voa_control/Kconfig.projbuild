@@ -1,0 +1,10 @@
+menu "EPS value"
+
+    config USE_EPS_VAR
+        int "Get EPS from MQTT before initialization of VOA"
+        range 0 1
+        default 0
+        help
+            If true the voa board will wait, before the min max value initialization for eps. **USE FOR DEBUG ONLY**
+
+endmenu

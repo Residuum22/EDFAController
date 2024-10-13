@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP LMR51420XDDCR
+D Switching Voltage Regulators SIMPLE SWITCHER power converter 4.5-V to 36-V, 2-A, synchronous buck with 40-uA IQ
+K
+F https://www.ti.com/lit/ds/symlink/lmr51420.pdf?ts=1663231243064
+$ENDCMP
+#
+#End Doc Library

@@ -1,0 +1,54 @@
+# For PCBs designed using KiCad: http://www.kicad-pcb.org/
+# Format documentation: http://kicad-pcb.org/help/file-formats/
+
+# Temporary files
+*.000
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*.sch-bak
+*~
+_autosave-*
+*.tmp
+*-save.pro
+*-save.kicad_pcb
+fp-info-cache
+fp-lib-table
+sym-lib-table
+
+# Backups
+*-backups
+
+# Local kicad files
+*.kicad_prl
+
+# Netlist files (exported from Eeschema)
+*.net
+
+# Autorouter files (exported from Pcbnew)
+*.dsn
+*.ses
+
+# Exported BOM files
+*.xml
+
+# Pycache
+*.pyc
+
+# VSCode
+settings.json
+
+# Log files
+*.log
+Firmware/voa_board_firmware/.pio/build
+Hardware/laser_module_kicad_prj/#auto_saved_files#
+Firmware/voa_board_firmware/build
+Firmware/voa_board_firmware/sdkconfig.old
+Firmware/voa_board_firmware/managed_components
+Firmware/voa_board_firmware/components/led_indicator/test
+Firmware/voa_board_firmware/dependencies.lock
+Firmware/laser_board_firmware/build
+Firmware/laser_board_firmware/sdkconfig.old
+
+Firmware/TestSoftwares/EDFA_cJSON/build

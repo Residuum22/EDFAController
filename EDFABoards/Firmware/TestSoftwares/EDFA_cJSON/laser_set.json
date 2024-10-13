@@ -1,0 +1,15 @@
+{
+"report_interval": 1,
+"laser_976_1": {
+    "laser_id": "LD1",
+    "enabled": true,
+    "desired_temperature": 35,
+    "desired_laser_diode_current": 360
+    },
+"laser_976_2": {
+    "laser_id": "LD6",
+    "enabled": true,
+    "desired_temperature": 35,
+    "desired_laser_diode_current": 200
+    }
+}

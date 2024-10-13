@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- the page starts here -->
+
+<head>
+  <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- -->
+  <!-- Bootstrap CSS -->
+
+  <title>EDFA - Vezérlőpult</title>
+  <link rel="shortcut icon" href="/img/laser_icon.png" />
+</head>
+
+<header>
+  <nav class="navbar bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="/img/laser_icon.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+        EDFA - Vezérlőpult
+      </a>
+      <a class="navbar-brand" href="/help">
+        <img src="/img/help.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+        EDFA felépítése
+      </a>
+    </div>
+  </nav>
+</header>
+
+<body>
+  <div class="p-3 mb-2 bg-warning text-dark">FIGYELEM: Ha az oldal újratöltődik az alap beállítások jelennek meg, 
+    de a rendszer az előzőleg kiküldött állapotban van.</div>
+  <div class="container">
+    <div class="row mt-3">
+      <!-- Instances generation - this will generate module 1,2,3 -->
+      {% for laser_module_id in laser_module_instances %}
+      <!-- Laser modules header is the same at all instances -->
+      <div class="col mt-3">
+        <div class="card" style="width: 32rem;">
+          <div class="card-body">
+
+            <h5 class="card-title text-center">Lézer modul {{laser_module_id['laser_module_id']}}</h5>
+
+            <div class="row">
+
+              <div class="col-sm-8">
+                <p class="card-text" id="laser_module_{{laser_module_id['laser_module_id']}}_desired_temperature">
+                  Lézerek kívánt hőmérséklete: 50 °C</p>
+              </div>
+
+              <div class="col text-right">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-secondary"
+                    onclick="increment_laser_desired_temperature({{laser_module_id['laser_module_id']}})">+</button>
+                  <button type="button" class="btn btn-secondary"
+                    onclick="decrement_laser_desired_temperature({{laser_module_id['laser_module_id']}})">-</button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Generate the 3 laser module 1 has 980nm and 1480nm -->
+            {% for laser_id in laser_module_id['laser_id'] %}
+
+            {% if '1' in laser_module_id['laser_module_id'] %}
+            <h5>976 nm lézer [{{laser_id}}]</h5>
+            {% elif '2' or '3' in laser_module_id['laser_module_id'] %}
+            <h5>1480 nm lézer [{{laser_id}}]</h5>
+            {% endif %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="laser_id_{{laser_id}}_on_off_switch"
+                onclick="enable_disable_laser_id('{{laser_id}}')">
+              <label class="form-check-label" for="laser_id_{{laser_id}}_on_off_switch">{{laser_id}}
+                engedélyezése/tiltása</label>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <p class="card-text" id="laser_module_{{laser_id}}_laser_diode_desired_current">
+                  Lézer dióda árama:
+                </p>
+              </div>
+
+              <div class="col-md-4">
+                <form class="form-inline">
+                  <div class="form-group col-md-8">
+
+                    {% if '1' in laser_module_id['laser_module_id'] %}
+                    <input class="form-control mx-sm-3" type="number" id="laser_module_{{laser_id}}_laser_current" min="0" max="360"></input>
+                    {% elif '2' or '3' in laser_module_id['laser_module_id'] %}
+                    <input class="form-control mx-sm-3" type="number" id="laser_module_{{laser_id}}_laser_current" min="0" max="700"></input>
+                    {% endif %}
+                    
+                  </div>
+                </form>
+              </div>
+
+              <div class="col-md-2">
+                <button type="button" class="btn btn-primary"
+                  onclick="send_laser_diode_desired_current('{{laser_id}}')">
+                  Beállít
+                </button>
+              </div>
+
+            </div>
+
+            <p class="card-text" id="laser_id_{{laser_id}}_temperature">Hőmérséklet: 0 °C</p>
+            <p class="card-text" id="laser_id_{{laser_id}}_monitor_diode_current">Monitor dióda feszültsége: 0 mV</p>
+            </p>
+            {% endfor %}
+            <!-- Module emergency shutdown -->
+            <div class="text-center mt-3">
+              <button type="button" class="btn btn-danger"
+                onclick="laser_emergency_stop({{laser_module_id['laser_id']}})">Vészleállítás</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- VOA attenuation set -->
+      <div class="col mt-3">
+        <div class="card text-right" style="width: 32rem;">
+          <div class="card-body">
+            <h5 class="card-title text-center">VOA (Variable Optical Attenuator)</h5>
+            <div class="row mt-3">
+              <div class="col-md-4">
+                <p class="card-text" id="voa_attenuation_name">
+                  Csillapítás:
+                </p>
+              </div>
+
+              <div class="col">
+                <div class="col-md-8">
+                  <input class="form-control" type="number" id="voa_attenuation" min="0" max="15" />
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <button type="button" class="btn btn-primary"
+                  onclick="send_voa_desired_current()">
+                  Beállít
+                </button>
+              </div>
+            </div>
+            <div class="text-center mt-3">
+              <button type="button" class="btn btn-primary" onclick="reset_voa_attenuation()">Alaphelyzetbe
+                állítás</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="/static/voa_events.js"></script>0
+  <script src="/static/laser_events.js"></script>
+  <script src="/static/websocket_handling.js"></script>
+</body>
+
+<div style="clear: both; height: 60px;">
+  <footer class="footer fixed-bottom">
+    <div class="my-3"></div>
+    <div class="text-center p-3 bg-light">©Mihalik Márk 2023</div>
+  </footer>
+
+</html>
